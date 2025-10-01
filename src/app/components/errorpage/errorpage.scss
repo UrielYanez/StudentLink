@@ -1,0 +1,159 @@
+.error-container {
+  text-align: center;
+  padding: 80px 20px;
+  color: #444;
+}
+
+h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+
+
+.navbar-modern {
+  border-bottom: 5px solid #dbdac8;
+  border-radius: 3%; 
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+.logo-img {
+  transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+}
+
+
+.brand-name {
+  color: #2b3751; 
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-size: 1.7rem;
+  transition: color 0.3s ease;
+}
+
+.navbar-brand:hover .brand-name {
+  color: #443451; 
+}
+
+
+.user-menu {
+  margin-left: auto;
+}
+
+.user-dropdown-toggle {
+  color: #2b3751;
+  background: transparent;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.user-dropdown-toggle:hover {
+  color: #443451;
+  background-color: rgba(219, 218, 200, 0.2); /* Fondo hueso muy suave */
+}
+
+.user-icon {
+  font-size: 1.5rem;
+  color: #443451;
+}
+
+.user-name {
+  margin: 0 0.3rem;
+}
+
+.dropdown-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.user-dropdown-toggle.show .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  border: 1px solid #dbdac8;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
+  min-width: 220px;
+}
+
+.dropdown-header {
+  color: #616161;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
+.dropdown-item {
+  color: #2b3751;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  margin: 0.2rem 0.5rem;
+}
+
+.dropdown-item i {
+  width: 20px;
+  text-align: center;
+  margin-right: 10px;
+  color: #443451;
+}
+
+.dropdown-item:hover {
+  color: #443451;
+  background-color: rgba(219, 218, 200, 0.3); /* Fondo hueso claro */
+}
+
+.dropdown-divider {
+  border-color: #dbdac8;
+  margin: 0.5rem 0;
+}
+
+.logout-item {
+  color: #dc3545 !important;
+}
+
+.logout-item:hover {
+  color: white !important;
+  background-color: #dc3545 !important;
+}
+
+.logout-item:hover i {
+  color: white !important;
+}
+
+
+
+@media (max-width: 992px) {
+  .brand-name {
+    font-size: 1.3rem;
+  }
+  
+  .user-dropdown-toggle {
+    padding: 0.5rem;
+  }
+}

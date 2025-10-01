@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
@@ -15,7 +16,8 @@ import { Nabvar } from './components/nabvar/nabvar';
 import { Footer } from './components/footer/footer';
 import { Errorpage } from './components/errorpage/errorpage';
 import { Login } from './auth/login/login';
-import { Home } from './reclutador/home/home';
+import { Home as homeReclutador } from './reclutador/home/home';
+import { homePrinciapal} from './components/home/home';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,8 @@ import { Home } from './reclutador/home/home';
     Footer,
     Errorpage,
     Login,
-    Home
+    homeReclutador,
+    homePrinciapal
   ],
   imports: [
     BrowserModule,
@@ -36,7 +39,9 @@ import { Home } from './reclutador/home/home';
     MatCardModule,        // <<--- IMPORTANTE
     MatFormFieldModule,   // <<--- IMPORTANTE
     MatInputModule,        // <<--- IMPORTANTE
-    MatCheckboxModule
+    MatCheckboxModule,
+     BrowserAnimationsModule,
+     
   ],
   providers: [],
   bootstrap: [App]

@@ -1,14 +1,17 @@
 .navbar {
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  padding: 0 24px; /* Increased padding for more space */
 
-  background-color: var(--mat-sys-primary, #102542);
-  color: var(--mat-sys-on-primary, #fff);
+  /* Modernized color palette - Deep Blue/Navy as primary, light gray background on scroll */
+  background-color: #1a237e; /* Darker, more professional blue */
+  color: #ffffff; /* White text for high contrast */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 
   .logo {
-    font-weight: bold;
-    font-size: 20px;
+    font-weight: 700; /* Bolder */
+    font-size: 22px; /* Slightly larger */
+    letter-spacing: 0.5px; /* Better readability */
     cursor: pointer;
     text-decoration: none;
     color: inherit;
@@ -18,14 +21,41 @@
     flex: 1 1 auto;
   }
 
+  /* --- General Button Styling --- */
   a[mat-button],
   a[mat-stroked-button],
   a[mat-flat-button] {
-    margin: 0 6px;
+    margin: 0 10px; /* Increased margin between buttons */
     text-decoration: none;
-    color: inherit;
+    font-weight: 500; /* Medium weight */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    border-radius: 4px; /* Rounded corners */
   }
 
+  /* --- Login Button (mat-button) - Secondary Action, Text style --- */
+  a[mat-button] {
+    color: inherit; /* White text */
+    opacity: 0.9; /* Slightly less opaque to distinguish from logo */
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1); /* Light hover effect */
+      opacity: 1;
+    }
+  }
+
+  /* --- Register Button (mat-stroked-button) - Primary Action, Outlined style --- */
+  a[mat-stroked-button] {
+    color: #ffd740; /* Vibrant accent color for the outline */
+    border: 1px solid #ffd740; /* Accent border */
+    padding: 6px 16px; /* Define padding for outlined button */
+
+    &:hover {
+      background-color: #ffd740; /* Accent color fill on hover */
+      color: #1a237e; /* Darker text on hover for contrast */
+    }
+  }
+  
+  /* --- User Menu Button (Logged in) --- */
   .navbar-right {
     display: flex;
     align-items: center;
@@ -33,10 +63,29 @@
     button[mat-button] {
       color: inherit;
       text-transform: none;
+      padding: 6px 12px;
+      border-radius: 4px;
 
       &:hover {
-        border: 1px solid var(--mat-sys-on-primary);
+        background-color: rgba(255, 255, 255, 0.15); /* Light hover background */
+        /* Removed the border on hover for a cleaner look */
       }
     }
+  }
+}
+
+/* --- Mat Menu Styling for consistency (Optional but recommended) --- */
+.mat-mdc-menu-panel {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mat-mdc-menu-item {
+  font-size: 14px;
+  color: #1a237e; /* Dark blue text */
+  &:hover {
+    background-color: #f0f0f0; /* Light gray hover */
+  }
+  mat-icon {
+    margin-right: 8px;
   }
 }

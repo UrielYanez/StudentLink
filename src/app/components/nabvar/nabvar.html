@@ -2,7 +2,7 @@
   <a class="logo" routerLink="/">StudentLink</a>
   <span class="spacer"></span>
 
-  <div class="navbar-right" *ngIf="isLoggedIn; else guestLinks">
+  <div class="navbar-right" *ngIf="shouldShowOptions() && isLoggedIn">
     <button mat-button [matMenuTriggerFor]="userMenu">
       {{ userName }}
     </button>
@@ -19,8 +19,9 @@
     </mat-menu>
   </div>
 
-  <ng-template #guestLinks>
-    <a mat-button routerLink="/login">Iniciar sesión</a>
-    <a mat-stroked-button routerLink="/register">Registrarse</a>
-  </ng-template>
+  <!-- Solo mostrar si estamos en /home -->
+  <ng-container *ngIf="showGuestLinks()">
+    <a mat-stroked-button  routerLink="/auth/login">Iniciar sesión</a>
+    <!-- <a mat-stroked-button routerLink="/register">Registrarse</a> -->
+  </ng-container>
 </mat-toolbar>

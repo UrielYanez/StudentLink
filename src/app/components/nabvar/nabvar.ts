@@ -8,14 +8,18 @@ import { Router } from '@angular/router';
   styleUrl: './nabvar.scss'
 })
 export class Nabvar {
-   isLoggedIn = true; // simula sesión
+   isLoggedIn = false; // simula sesión
   userName = 'Brayan';
 
   constructor(private router: Router) {}
-
+  // Método para ocultar opciones según la ruta
+  shouldShowOptions(): boolean {
+    const hideOnPaths = ['/auth/login']; // rutas donde no se muestran opciones
+    return !hideOnPaths.includes(this.router.url);
+  }
   logout() {
     this.isLoggedIn = false;
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 
   goToProfile() {
@@ -24,5 +28,10 @@ export class Nabvar {
 
   goToSettings() {
     this.router.navigate(['/settings']);
+  }
+
+    // Método para mostrar enlaces solo en /home
+  showGuestLinks(): boolean {
+    return this.router.url === '/home';
   }
 }
