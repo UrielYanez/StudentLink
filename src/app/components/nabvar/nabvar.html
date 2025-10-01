@@ -1,1 +1,26 @@
-<p>nabvar works!</p>
+<mat-toolbar class="navbar">
+  <a class="logo" routerLink="/">StudentLink</a>
+  <span class="spacer"></span>
+
+  <div class="navbar-right" *ngIf="isLoggedIn; else guestLinks">
+    <button mat-button [matMenuTriggerFor]="userMenu">
+      {{ userName }}
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item (click)="goToProfile()">
+        <mat-icon>person</mat-icon> Perfil
+      </button>
+      <button mat-menu-item (click)="goToSettings()">
+        <mat-icon>settings</mat-icon> Configuración
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon> Cerrar sesión
+      </button>
+    </mat-menu>
+  </div>
+
+  <ng-template #guestLinks>
+    <a mat-button routerLink="/login">Iniciar sesión</a>
+    <a mat-stroked-button routerLink="/register">Registrarse</a>
+  </ng-template>
+</mat-toolbar>
