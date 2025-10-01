@@ -3,10 +3,20 @@ import { BrowserModule, provideClientHydration, withEventReplay } from '@angular
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
+import { Nabvar } from './components/nabvar/nabvar';
+import { Footer } from './components/footer/footer';
+import { Errorpage } from './components/errorpage/errorpage';
+import { Login } from './auth/login/login';
+import { Home } from './reclutador/home/home';
 
 @NgModule({
   declarations: [
-    App
+    App,
+    Nabvar,
+    Footer,
+    Errorpage,
+    Login,
+    Home
   ],
   imports: [
     BrowserModule,
