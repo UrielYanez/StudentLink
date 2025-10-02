@@ -1,32 +1,48 @@
+<!-- login.html -->
 <section class="login-section">
   <div class="login-container">
     <div class="login-image">
       <img src="https://universitariosenapuros.com/wp-content/uploads/home3.png" alt="Phone image">
     </div>
     <mat-card class="login-card">
-      <form>
+      <form (ngSubmit)="login()">
         <h3 class="login-title">INICIAR SESION</h3>
 
         <!-- Email -->
         <mat-form-field appearance="fill" class="full-width mb-3 rounded-input">
-          <mat-label>Usuario</mat-label>
-          <input matInput type="email" placeholder="Escribe tu Usuario" />
+          <mat-label>Email</mat-label>
+          <input 
+            matInput 
+            type="email" 
+            placeholder="Escribe tu Email"
+            [(ngModel)]="email"
+            name="email"
+            required />
         </mat-form-field>
 
         <!-- Password -->
         <mat-form-field appearance="fill" class="full-width mb-3 rounded-input">
           <mat-label>Contraseña</mat-label>
-          <input matInput type="password" placeholder="Escribe tu Contraseña" />
+          <input 
+            matInput 
+            [type]="passwordVisible ? 'text' : 'password'"
+            placeholder="Escribe tu Contraseña"
+            [(ngModel)]="password"
+            name="password"
+            required />
+          <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
+            <mat-icon>{{ passwordVisible ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
         </mat-form-field>
 
-        <!-- Checkbox + forgot password -->
-        <div class="login-options">
-          <mat-checkbox>Remember me</mat-checkbox>
-          <a href="#">Forgot password?</a>
-        </div>
-
         <!-- Submit button -->
-        <button mat-raised-button color="primary" class="full-width mb-3 rounded-btn">Sign in</button>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="full-width mb-3 rounded-btn"
+          [disabled]="isLoading">
+          {{ isLoading ? 'Cargando...' : 'Iniciar Sesión' }}
+        </button>
       </form>
     </mat-card>
   </div>

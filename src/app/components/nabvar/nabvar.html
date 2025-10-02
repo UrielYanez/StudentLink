@@ -1,5 +1,5 @@
 <mat-toolbar class="navbar">
-  <a class="logo" routerLink="/">StudentLink</a>
+  <a class="logo" routerLink="/home">StudentLink</a>
   <span class="spacer"></span>
 
   <div class="navbar-right" *ngIf="shouldShowOptions() && isLoggedIn">
@@ -19,9 +19,7 @@
     </mat-menu>
   </div>
 
-  <!-- Solo mostrar si estamos en /home -->
   <ng-container *ngIf="showGuestLinks()">
-    <a mat-stroked-button  routerLink="/auth/login">Iniciar sesión</a>
-    <!-- <a mat-stroked-button routerLink="/register">Registrarse</a> -->
+    <a mat-stroked-button routerLink="/auth/login">Iniciar sesión</a>
   </ng-container>
 </mat-toolbar>

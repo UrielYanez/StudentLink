@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule } from '@angular/forms'; 
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
@@ -18,14 +19,13 @@ import { Errorpage } from './components/errorpage/errorpage';
 import { Login } from './auth/login/login';
 import { Home as homeReclutador } from './reclutador/home/home';
 import { homePrinciapal} from './components/home/home';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
     App,
-    Nabvar,
     Footer,
     Errorpage,
-    Login,
     homeReclutador,
     homePrinciapal
   ],
@@ -41,7 +41,10 @@ import { homePrinciapal} from './components/home/home';
     MatInputModule,        // <<--- IMPORTANTE
     MatCheckboxModule,
      BrowserAnimationsModule,
-     
+      FormsModule,
+     HttpClientModule,
+       Nabvar,   
+    Login  
   ],
   providers: [],
   bootstrap: [App]
