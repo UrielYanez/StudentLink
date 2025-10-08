@@ -19,7 +19,8 @@ import { Errorpage } from './components/errorpage/errorpage';
 import { Login } from './auth/login/login';
 import { Home as homeReclutador } from './reclutador/home/home';
 import { homePrinciapal} from './components/home/home';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './auth/Interceptor/auth-interceptor';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,7 @@ import { HttpClientModule } from '@angular/common/http';
        Nabvar,   
     Login  
   ],
-  providers: [],
+  providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [App]
 })
 export class AppModule { }
