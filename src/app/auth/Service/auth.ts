@@ -38,7 +38,7 @@ export class Auth {
 
   login(email: string, password: string): Observable<LoginResponse> {
     this.removeToken();
-    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, { email, password }).pipe(
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/api/auth/login`, { email, password }).pipe(
       tap(response => {
         if (response?.token) {
           this.setToken(response.token);
