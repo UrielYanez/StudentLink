@@ -1,0 +1,233 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">{{ isEdit ? 'Editar Vacante' : 'Nueva Vacante' }}</h4>
+        </div>
+        <div class="card-body">
+          <!-- Loading -->
+          <div *ngIf="loading" class="text-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+
+          <!-- Error -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''"></button>
+          </div>
+
+          <!-- Success -->
+          <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ success }}
+          </div>
+
+          <form *ngIf="!loading" (ngSubmit)="onSubmit()" #vacanteForm="ngForm">
+            <div class="row">
+              <!-- Información Básica -->
+              <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Información Básica</h5>
+
+                <div class="mb-3">
+                  <label for="titulo" class="form-label">Título *</label>
+                  <input type="text" class="form-control" id="titulo"
+                         [(ngModel)]="vacante.titulo" name="titulo" required>
+                </div>
+
+                <div class="mb-3">
+                  <label for="empresa" class="form-label">Empresa *</label>
+                  <input type="text" class="form-control" id="empresa"
+                         [(ngModel)]="vacante.empresa" name="empresa" required>
+                </div>
+
+                <div class="mb-3">
+                  <label for="descripcion" class="form-label">Descripción *</label>
+                  <textarea class="form-control" id="descripcion" rows="4"
+                            [(ngModel)]="vacante.descripcion" name="descripcion" required></textarea>
+                </div>
+
+                <div class="mb-3">
+                  <label for="ubicacion" class="form-label">Ubicación *</label>
+                  <input type="text" class="form-control" id="ubicacion"
+                         [(ngModel)]="vacante.ubicacion" name="ubicacion" required>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="salario" class="form-label">Salario *</label>
+                      <input type="number" class="form-control" id="salario"
+                             [(ngModel)]="vacante.salario" name="salario" required min="0" step="0.01">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="solicitudesPermitidas" class="form-label">Solicitudes Permitidas *</label>
+                      <input type="number" class="form-control" id="solicitudesPermitidas"
+                             [(ngModel)]="vacante.solicitudesPermitidas" name="solicitudesPermitidas" required min="1">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Detalles del Trabajo -->
+              <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Detalles del Trabajo</h5>
+
+                <div class="mb-3">
+                  <label for="areaId" class="form-label">Área *</label>
+                  <select class="form-select" id="areaId"
+                          [(ngModel)]="vacante.areaId" name="areaId"
+                          (change)="onAreaChange()" required>
+                    <option value="">Seleccione un área</option>
+                    <option *ngFor="let area of areas" [value]="area.id">{{ area.nombre }}</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="modalidadId" class="form-label">Modalidad *</label>
+                  <select class="form-select" id="modalidadId"
+                          [(ngModel)]="vacante.modalidadId" name="modalidadId" required>
+                    <option value="">Seleccione una modalidad</option>
+                    <option *ngFor="let modalidad of modalidades" [value]="modalidad.id">
+                      {{ modalidad.nombre }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="tipoContrato" class="form-label">Tipo de Contrato *</label>
+                  <input type="text" class="form-control" id="tipoContrato"
+                         [(ngModel)]="vacante.tipoContrato" name="tipoContrato" required>
+                </div>
+
+                <div class="mb-3">
+                  <label for="fechaExpiracion" class="form-label">Fecha de Expiración *</label>
+                  <input type="datetime-local" class="form-control" id="fechaExpiracion"
+                         [(ngModel)]="vacante.fechaExpiracion" name="fechaExpiracion" required>
+                </div>
+
+                <div class="mb-3">
+                  <label for="beneficios" class="form-label">Beneficios</label>
+                  <textarea class="form-control" id="beneficios" rows="3"
+                            [(ngModel)]="vacante.beneficios" name="beneficios"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Horario -->
+            <h5 class="border-bottom pb-2 mb-3 mt-4">Horario de Trabajo</h5>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="horaInicio" class="form-label">Hora de Inicio</label>
+                  <input type="time" class="form-control" id="horaInicio"
+                         [(ngModel)]="vacante.horaInicio" name="horaInicio">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="horaFin" class="form-label">Hora de Fin</label>
+                  <input type="time" class="form-control" id="horaFin"
+                         [(ngModel)]="vacante.horaFin" name="horaFin">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="horasPorSemana" class="form-label">Horas por Semana</label>
+                  <input type="number" class="form-control" id="horasPorSemana"
+                         [(ngModel)]="vacante.horasPorSemana" name="horasPorSemana" min="0">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="diasLaborales" class="form-label">Días Laborales</label>
+                  <input type="text" class="form-control" id="diasLaborales"
+                         [(ngModel)]="vacante.diasLaborales" name="diasLaborales"
+                         placeholder="Ej: Lunes a Viernes">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="turno" class="form-label">Turno</label>
+                  <select class="form-select" id="turno" [(ngModel)]="vacante.turno" name="turno">
+                    <option value="">Seleccione un turno</option>
+                    <option value="Matutino">Matutino</option>
+                    <option value="Vespertino">Vespertino</option>
+                    <option value="Nocturno">Nocturno</option>
+                    <option value="Mixto">Mixto</option>
+                    <option value="Flexible">Flexible</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="horarioFlexible"
+                     [(ngModel)]="vacante.horarioFlexible" name="horarioFlexible">
+              <label class="form-check-label" for="horarioFlexible">Horario Flexible</label>
+            </div>
+
+            <!-- Habilidades e Idiomas -->
+            <div class="row mt-4">
+              <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Habilidades Requeridas</h5>
+                <div class="mb-3">
+                  <div *ngIf="habilidadesFiltradas.length > 0" class="skills-container">
+                    <div *ngFor="let habilidad of habilidadesFiltradas" class="form-check">
+                      <input class="form-check-input" type="checkbox"
+                             [id]="'hab_' + habilidad.id"
+                             [checked]="vacante.habilidadesIds.includes(habilidad.id)"
+                             (change)="toggleHabilidad(habilidad.id)">
+                      <label class="form-check-label" [for]="'hab_' + habilidad.id">
+                        {{ habilidad.nombre }}
+                      </label>
+                    </div>
+                  </div>
+                  <div *ngIf="!vacante.areaId" class="text-muted">
+                    Seleccione un área para ver las habilidades disponibles
+                  </div>
+                  <div *ngIf="vacante.areaId && habilidadesFiltradas.length === 0" class="text-muted">
+                    No hay habilidades disponibles para esta área
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Idiomas Requeridos</h5>
+                <div class="mb-3">
+                  <div *ngIf="idiomas.length > 0" class="skills-container">
+                    <div *ngFor="let idioma of idiomas" class="form-check">
+                      <input class="form-check-input" type="checkbox"
+                             [id]="'idioma_' + idioma.id"
+                             [checked]="vacante.idiomasIds.includes(idioma.id)"
+                             (change)="toggleIdioma(idioma.id)">
+                      <label class="form-check-label" [for]="'idioma_' + idioma.id">
+                        {{ idioma.idioma }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex gap-2 justify-content-end mt-4">
+              <button type="button" class="btn btn-secondary" (click)="cancelar()">
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="!vacanteForm.form.valid">
+                {{ isEdit ? 'Actualizar' : 'Crear' }} Vacante
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
