@@ -1,13 +1,13 @@
 .footer-container {
   width: 100%;
-  background: #102542;
+  background: #ffffff;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 
   .footer {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px 24px;
-    color: #fff;
+    color: #000000;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -27,7 +27,7 @@
       align-items: center;
 
       a {
-        color: #fff;
+        color: #000000;
         margin-left: 15px;
         font-size: 18px;
         transition: color 0.3s ease;
