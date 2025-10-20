@@ -109,6 +109,7 @@ export class UsuarioContextService {
         if (userData) {
             userData.id = id;
             localStorage.setItem('user', JSON.stringify(userData));
+            console.log( userData.id = id, JSON.stringify(userData))
         }
     }
 
@@ -135,6 +136,7 @@ export class UsuarioContextService {
      * Obtiene el ID del usuario actual
      */
     getUsuarioId(): number | null {
+        
         return this.usuarioIdSubject.value;
     }
 

@@ -28,7 +28,8 @@ export class Auth {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private injector: Injector // Solo usar para obtener UsuarioContextService dinámicamente
+    private injector: Injector, // Solo usar para obtener UsuarioContextService dinámicamente
+     private usuarioContextService: UsuarioContextService
   ) {}
 
   private getUsuarioContext(): UsuarioContextService {
@@ -36,15 +37,15 @@ export class Auth {
     return this.injector.get(UsuarioContextService);
   }
 
-  login(email: string, password: string): Observable<LoginResponse> {
-    this.removeToken();
+login(email: string, password: string): Observable<LoginResponse> {
+    this.removeToken(); // limpia datos anteriores
     return this.http.post<LoginResponse>(`${environment.apiUrl}/api/auth/login`, { email, password }).pipe(
       tap(response => {
         if (response?.token) {
           this.setToken(response.token);
-          if (response.user) {
-            this.setUserData(response.user);
-          }
+        }
+        if (response?.user) {
+          this.setUserData(response.user);
         }
       })
     );
@@ -52,38 +53,18 @@ export class Auth {
 
   setToken(token: string): void {
     localStorage.setItem('authToken', token);
-
-    try {
-      const payloadBase64 = token.split('.')[1];
-      const decodedPayload = JSON.parse(atob(payloadBase64));
-
-      const userData = {
-        name: decodedPayload?.sub || 'Usuario',
-        roles: decodedPayload?.roles || []
-      };
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      // Actualizar UsuarioContextService dinámicamente
-      this.getUsuarioContext().setUsuarioData(userData, token);
-    } catch (err) {
-      console.error('Error al procesar el token:', err);
-    }
+    this.usuarioContextService.setToken(token);
   }
 
   setUserData(userData: any): void {
-    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-    const updatedUser = {
-      name: userData.email || currentUser.name,
+    const roles = userData.roles?.map((r: any) => r.name) ?? [];
+    const userToStore = {
       id: userData.id,
-      roles: currentUser.roles || [],
-      empresaId: userData.empresa?.id || null
+      name: userData.username || userData.email,
+      roles
     };
-
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    this.getUsuarioContext().setUsuarioData(updatedUser);
-    if (updatedUser.empresaId) {
-      this.getUsuarioContext().setEmpresaId(updatedUser.empresaId);
-    }
+     localStorage.setItem('user', JSON.stringify(userToStore));
+    this.usuarioContextService.setUsuarioData(userToStore);
   }
 
   getToken(): string | null {

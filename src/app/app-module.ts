@@ -21,6 +21,8 @@ import { Home as homeReclutador } from './reclutador/home/home';
 import { homePrinciapal} from './components/home/home';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './auth/Interceptor/auth-interceptor';
+import { CommonModule } from '@angular/common';
+import { homeMaching } from './matching/home/home';
 
 @NgModule({
   declarations: [
@@ -28,10 +30,12 @@ import { AuthInterceptor } from './auth/Interceptor/auth-interceptor';
     Footer,
     Errorpage,
     homeReclutador,
-    homePrinciapal
+    homePrinciapal,
+    homeMaching
   ],
   imports: [
     BrowserModule,
+    CommonModule  ,
     AppRoutingModule,
     MatToolbarModule,
     MatButtonModule,
