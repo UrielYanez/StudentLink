@@ -32,13 +32,14 @@ import { homeMaching } from './matching/home/home';
     Footer,
     Errorpage,
     homePrinciapal,
+    homeMaching,
     VacanteListComponent,
     VacanteFormComponent,
     homeMaching
   ],
   imports: [
     BrowserModule,
-    CommonModule  ,
+    CommonModule,
     AppRoutingModule,
     MatToolbarModule,
     MatButtonModule,
@@ -54,11 +55,12 @@ import { homeMaching } from './matching/home/home';
      HttpClientModule,
        Nabvar,
     Login,
-    RouterModule
+    RouterModule,
+    CommonModule,
+    FormsModule
   ],
-    providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    DecimalPipe // 👈 AÑADE ESTO
+  providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    DecimalPipe
   ],
   bootstrap: [App]
 })

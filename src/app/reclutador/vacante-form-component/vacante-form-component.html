@@ -1,161 +1,203 @@
-<div class="container mt-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <div class="card">
-        <div class="card-header">
-          <h4 class="mb-0">{{ isEdit ? 'Editar Vacante' : 'Nueva Vacante' }}</h4>
+<div class="modal-backdrop" [class.show]="show" (click)="onBackdropClick($event)">
+  <div class="modal-content" [class.show]="show">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="bi bi-briefcase me-2"></i>
+        {{ isEdit ? 'Editar Vacante' : 'Nueva Vacante' }}
+      </h3>
+      <button type="button" class="btn-close" (click)="onClose()">
+        <span class="visually-hidden">Cerrar</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
         </div>
-        <div class="card-body">
-          <!-- Loading -->
-          <div *ngIf="loading" class="text-center">
-            <div class="spinner-border" role="status">
-              <span class="visually-hidden">Cargando...</span>
+        <p class="mt-2 text-muted">
+          {{ isEdit ? 'Actualizando vacante...' : 'Creando vacante...' }}
+        </p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ error }}
+        <button type="button" class="btn-close" (click)="error = ''"></button>
+      </div>
+
+      <!-- Success -->
+      <div *ngIf="success && !loading" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        {{ success }}
+      </div>
+
+      <form *ngIf="!loading" (ngSubmit)="onSubmit()" #vacanteForm="ngForm" class="vacante-form">
+        <div class="form-sections">
+          <!-- Información Básica -->
+          <div class="form-section">
+            <h4 class="section-title">
+              <i class="bi bi-info-circle me-2"></i>
+              Información Básica
+            </h4>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="titulo" class="form-label">Título del puesto *</label>
+                  <input type="text" class="form-control" id="titulo"
+                         [(ngModel)]="vacanteRequest.titulo" name="titulo"
+                         required placeholder="Ej: Desarrollador Frontend">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="empresa" class="form-label">Empresa *</label>
+                  <input type="text" class="form-control" id="empresa"
+                         [(ngModel)]="vacanteRequest.empresa" name="empresa"
+                         required placeholder="Nombre de la empresa">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="descripcion" class="form-label">Descripción del puesto *</label>
+              <textarea class="form-control" id="descripcion" rows="4"
+                        [(ngModel)]="vacanteRequest.descripcion" name="descripcion"
+                        required placeholder="Describe las responsabilidades y funciones del puesto..."></textarea>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="ubicacion" class="form-label">Ubicación *</label>
+                  <input type="text" class="form-control" id="ubicacion"
+                         [(ngModel)]="vacanteRequest.ubicacion" name="ubicacion"
+                         required placeholder="Ciudad, Estado">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="salario" class="form-label">Salario mensual *</label>
+                  <input type="number" class="form-control" id="salario"
+                         [(ngModel)]="vacanteRequest.salario" name="salario"
+                         required min="0" step="0.01" placeholder="0.00">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="solicitudesPermitidas" class="form-label">Solicitudes permitidas *</label>
+                  <input type="number" class="form-control" id="solicitudesPermitidas"
+                         [(ngModel)]="vacanteRequest.solicitudesPermitidas" name="solicitudesPermitidas"
+                         required min="1" placeholder="50">
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Error -->
-          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ error }}
-            <button type="button" class="btn-close" (click)="error = ''"></button>
-          </div>
-
-          <!-- Success -->
-          <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ success }}
-          </div>
-
-          <form *ngIf="!loading" (ngSubmit)="onSubmit()" #vacanteForm="ngForm">
+          <!-- Detalles del Trabajo -->
+          <div class="form-section">
+            <h4 class="section-title">
+              <i class="bi bi-briefcase me-2"></i>
+              Detalles del Trabajo
+            </h4>
             <div class="row">
-              <!-- Información Básica -->
               <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Información Básica</h5>
-
-                <div class="mb-3">
-                  <label for="titulo" class="form-label">Título *</label>
-                  <input type="text" class="form-control" id="titulo"
-                         [(ngModel)]="vacante.titulo" name="titulo" required>
-                </div>
-
-                <div class="mb-3">
-                  <label for="empresa" class="form-label">Empresa *</label>
-                  <input type="text" class="form-control" id="empresa"
-                         [(ngModel)]="vacante.empresa" name="empresa" required>
-                </div>
-
-                <div class="mb-3">
-                  <label for="descripcion" class="form-label">Descripción *</label>
-                  <textarea class="form-control" id="descripcion" rows="4"
-                            [(ngModel)]="vacante.descripcion" name="descripcion" required></textarea>
-                </div>
-
-                <div class="mb-3">
-                  <label for="ubicacion" class="form-label">Ubicación *</label>
-                  <input type="text" class="form-control" id="ubicacion"
-                         [(ngModel)]="vacante.ubicacion" name="ubicacion" required>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="salario" class="form-label">Salario *</label>
-                      <input type="number" class="form-control" id="salario"
-                             [(ngModel)]="vacante.salario" name="salario" required min="0" step="0.01">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="solicitudesPermitidas" class="form-label">Solicitudes Permitidas *</label>
-                      <input type="number" class="form-control" id="solicitudesPermitidas"
-                             [(ngModel)]="vacante.solicitudesPermitidas" name="solicitudesPermitidas" required min="1">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Detalles del Trabajo -->
-              <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Detalles del Trabajo</h5>
-
-                <div class="mb-3">
-                  <label for="areaId" class="form-label">Área *</label>
+                <div class="form-group">
+                  <label for="areaId" class="form-label">Área profesional *</label>
                   <select class="form-select" id="areaId"
-                          [(ngModel)]="vacante.areaId" name="areaId"
+                          [(ngModel)]="vacanteRequest.areaId" name="areaId"
                           (change)="onAreaChange()" required>
                     <option value="">Seleccione un área</option>
                     <option *ngFor="let area of areas" [value]="area.id">{{ area.nombre }}</option>
                   </select>
                 </div>
-
-                <div class="mb-3">
-                  <label for="modalidadId" class="form-label">Modalidad *</label>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="modalidadId" class="form-label">Modalidad de trabajo *</label>
                   <select class="form-select" id="modalidadId"
-                          [(ngModel)]="vacante.modalidadId" name="modalidadId" required>
+                          [(ngModel)]="vacanteRequest.modalidadId" name="modalidadId" required>
                     <option value="">Seleccione una modalidad</option>
                     <option *ngFor="let modalidad of modalidades" [value]="modalidad.id">
                       {{ modalidad.nombre }}
                     </option>
                   </select>
                 </div>
+              </div>
+            </div>
 
-                <div class="mb-3">
-                  <label for="tipoContrato" class="form-label">Tipo de Contrato *</label>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="tipoContrato" class="form-label">Tipo de contrato *</label>
                   <input type="text" class="form-control" id="tipoContrato"
-                         [(ngModel)]="vacante.tipoContrato" name="tipoContrato" required>
+                         [(ngModel)]="vacanteRequest.tipoContrato" name="tipoContrato"
+                         required placeholder="Ej: Tiempo completo, Indefinido">
                 </div>
-
-                <div class="mb-3">
-                  <label for="fechaExpiracion" class="form-label">Fecha de Expiración *</label>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="fechaExpiracion" class="form-label">Fecha de expiración *</label>
                   <input type="datetime-local" class="form-control" id="fechaExpiracion"
-                         [(ngModel)]="vacante.fechaExpiracion" name="fechaExpiracion" required>
-                </div>
-
-                <div class="mb-3">
-                  <label for="beneficios" class="form-label">Beneficios</label>
-                  <textarea class="form-control" id="beneficios" rows="3"
-                            [(ngModel)]="vacante.beneficios" name="beneficios"></textarea>
+                         [(ngModel)]="vacanteRequest.fechaExpiracion" name="fechaExpiracion" required>
                 </div>
               </div>
             </div>
 
-            <!-- Horario -->
-            <h5 class="border-bottom pb-2 mb-3 mt-4">Horario de Trabajo</h5>
+            <div class="form-group">
+              <label for="beneficios" class="form-label">Beneficios adicionales</label>
+              <textarea class="form-control" id="beneficios" rows="3"
+                        [(ngModel)]="vacanteRequest.beneficios" name="beneficios"
+                        placeholder="Seguro médico, vales de despensa, bonos, etc..."></textarea>
+            </div>
+          </div>
+
+          <!-- Horario de Trabajo -->
+          <div class="form-section">
+            <h4 class="section-title">
+              <i class="bi bi-clock me-2"></i>
+              Horario de Trabajo
+            </h4>
             <div class="row">
               <div class="col-md-4">
-                <div class="mb-3">
-                  <label for="horaInicio" class="form-label">Hora de Inicio</label>
+                <div class="form-group">
+                  <label for="horaInicio" class="form-label">Hora de inicio</label>
                   <input type="time" class="form-control" id="horaInicio"
-                         [(ngModel)]="vacante.horaInicio" name="horaInicio">
+                         [(ngModel)]="vacanteRequest.horaInicio" name="horaInicio">
                 </div>
               </div>
               <div class="col-md-4">
-                <div class="mb-3">
-                  <label for="horaFin" class="form-label">Hora de Fin</label>
+                <div class="form-group">
+                  <label for="horaFin" class="form-label">Hora de fin</label>
                   <input type="time" class="form-control" id="horaFin"
-                         [(ngModel)]="vacante.horaFin" name="horaFin">
+                         [(ngModel)]="vacanteRequest.horaFin" name="horaFin">
                 </div>
               </div>
               <div class="col-md-4">
-                <div class="mb-3">
-                  <label for="horasPorSemana" class="form-label">Horas por Semana</label>
+                <div class="form-group">
+                  <label for="horasPorSemana" class="form-label">Horas por semana</label>
                   <input type="number" class="form-control" id="horasPorSemana"
-                         [(ngModel)]="vacante.horasPorSemana" name="horasPorSemana" min="0">
+                         [(ngModel)]="vacanteRequest.horasPorSemana" name="horasPorSemana"
+                         min="0" max="168" placeholder="40">
                 </div>
               </div>
             </div>
 
             <div class="row">
               <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="diasLaborales" class="form-label">Días Laborales</label>
+                <div class="form-group">
+                  <label for="diasLaborales" class="form-label">Días laborales</label>
                   <input type="text" class="form-control" id="diasLaborales"
-                         [(ngModel)]="vacante.diasLaborales" name="diasLaborales"
+                         [(ngModel)]="vacanteRequest.diasLaborales" name="diasLaborales"
                          placeholder="Ej: Lunes a Viernes">
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="mb-3">
+                <div class="form-group">
                   <label for="turno" class="form-label">Turno</label>
-                  <select class="form-select" id="turno" [(ngModel)]="vacante.turno" name="turno">
+                  <select class="form-select" id="turno" [(ngModel)]="vacanteRequest.turno" name="turno">
                     <option value="">Seleccione un turno</option>
                     <option value="Matutino">Matutino</option>
                     <option value="Vespertino">Vespertino</option>
@@ -167,67 +209,83 @@
               </div>
             </div>
 
-            <div class="mb-3 form-check">
+            <div class="form-check">
               <input type="checkbox" class="form-check-input" id="horarioFlexible"
-                     [(ngModel)]="vacante.horarioFlexible" name="horarioFlexible">
-              <label class="form-check-label" for="horarioFlexible">Horario Flexible</label>
+                     [(ngModel)]="vacanteRequest.horarioFlexible" name="horarioFlexible">
+              <label class="form-check-label" for="horarioFlexible">Horario flexible</label>
             </div>
+          </div>
 
-            <!-- Habilidades e Idiomas -->
-            <div class="row mt-4">
+          <!-- Habilidades e Idiomas -->
+          <div class="form-section">
+            <div class="row">
               <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Habilidades Requeridas</h5>
-                <div class="mb-3">
-                  <div *ngIf="habilidadesFiltradas.length > 0" class="skills-container">
-                    <div *ngFor="let habilidad of habilidadesFiltradas" class="form-check">
-                      <input class="form-check-input" type="checkbox"
+                <h4 class="section-title">
+                  <i class="bi bi-tools me-2"></i>
+                  Habilidades Requeridas
+                </h4>
+                <div class="skills-container">
+                  <div *ngIf="vacanteRequest.areaId && habilidadesFiltradas.length > 0" class="skills-list">
+                    <div *ngFor="let habilidad of habilidadesFiltradas" class="skill-item">
+                      <input type="checkbox" class="form-check-input"
                              [id]="'hab_' + habilidad.id"
-                             [checked]="vacante.habilidadesIds.includes(habilidad.id)"
+                             [checked]="isHabilidadSelected(habilidad.id)"
                              (change)="toggleHabilidad(habilidad.id)">
                       <label class="form-check-label" [for]="'hab_' + habilidad.id">
                         {{ habilidad.nombre }}
                       </label>
                     </div>
                   </div>
-                  <div *ngIf="!vacante.areaId" class="text-muted">
-                    Seleccione un área para ver las habilidades disponibles
+                  <div *ngIf="!vacanteRequest.areaId" class="no-skills">
+                    <i class="bi bi-info-circle"></i>
+                    <p>Seleccione un área para ver las habilidades disponibles</p>
                   </div>
-                  <div *ngIf="vacante.areaId && habilidadesFiltradas.length === 0" class="text-muted">
-                    No hay habilidades disponibles para esta área
+                  <div *ngIf="vacanteRequest.areaId && habilidadesFiltradas.length === 0" class="no-skills">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <p>No hay habilidades disponibles para esta área</p>
                   </div>
                 </div>
               </div>
 
               <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Idiomas Requeridos</h5>
-                <div class="mb-3">
-                  <div *ngIf="idiomas.length > 0" class="skills-container">
-                    <div *ngFor="let idioma of idiomas" class="form-check">
-                      <input class="form-check-input" type="checkbox"
+                <h4 class="section-title">
+                  <i class="bi bi-translate me-2"></i>
+                  Idiomas Requeridos
+                </h4>
+                <div class="skills-container">
+                  <div *ngIf="idiomas.length > 0" class="skills-list">
+                    <div *ngFor="let idioma of idiomas" class="skill-item">
+                      <input type="checkbox" class="form-check-input"
                              [id]="'idioma_' + idioma.id"
-                             [checked]="vacante.idiomasIds.includes(idioma.id)"
+                             [checked]="isIdiomaSelected(idioma.id)"
                              (change)="toggleIdioma(idioma.id)">
                       <label class="form-check-label" [for]="'idioma_' + idioma.id">
                         {{ idioma.idioma }}
                       </label>
                     </div>
                   </div>
+                  <div *ngIf="idiomas.length === 0" class="no-skills">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <p>No hay idiomas disponibles</p>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <!-- Botones -->
-            <div class="d-flex gap-2 justify-content-end mt-4">
-              <button type="button" class="btn btn-secondary" (click)="cancelar()">
-                Cancelar
-              </button>
-              <button type="submit" class="btn btn-primary" [disabled]="!vacanteForm.form.valid">
-                {{ isEdit ? 'Actualizar' : 'Crear' }} Vacante
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
-      </div>
+
+        <!-- Botones de acción -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="onClose()" [disabled]="loading">
+            <i class="bi bi-x-circle me-2"></i>
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="!vacanteForm.form.valid || loading">
+            <i class="bi bi-check-circle me-2"></i>
+            {{ isEdit ? 'Actualizar' : 'Crear' }} Vacante
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
