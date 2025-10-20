@@ -39,6 +39,7 @@ import { homeMaching } from './matching/home/home';
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     AppRoutingModule,
     MatToolbarModule,
     MatButtonModule,

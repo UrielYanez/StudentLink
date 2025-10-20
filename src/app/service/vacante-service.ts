@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { ApiResponse, Area, Habilidad, Idioma, Modalidad, Vacante, VacanteRequest } from '../models/vacante-model';
 import { environment } from '../environments/environments';
 
@@ -18,8 +18,28 @@ export class VacanteService {
   }
 
   obtenerVacantePorId(id: number): Observable<ApiResponse<Vacante>> {
-    return this.http.get<ApiResponse<Vacante>>(`${this.baseUrl}/vacantes/${id}`);
-  }
+  console.log('📥 VacanteService - Obteniendo vacante por ID:', id);
+  return this.http.get<ApiResponse<Vacante>>(`${this.baseUrl}/vacantes/${id}/completa`).pipe(
+    tap(response => {
+      console.log('🔍 VacanteService - Respuesta completa:', response);
+      if (response.success) {
+        console.log('📊 VacanteService - Datos de vacante:', {
+          id: response.data.id,
+          titulo: response.data.titulo,
+          area: response.data.area,
+          modalidad: response.data.modalidad,
+          habilidades: response.data.habilidades,
+          idiomas: response.data.idiomas
+        });
+      }
+    })
+  );
+}
+
+obtenerVacanteParaEdicion(id: number): Observable<ApiResponse<Vacante>> {
+  console.log('📥 VacanteService - Obteniendo vacante para edición:', id);
+  return this.http.get<ApiResponse<Vacante>>(`${this.baseUrl}/vacantes/${id}/edicion`);
+}
 
   obtenerVacantesPorEmpresa(empresa: string): Observable<ApiResponse<Vacante[]>> {
     return this.http.get<ApiResponse<Vacante[]>>(`${this.baseUrl}/vacantes/empresa/${empresa}`);
