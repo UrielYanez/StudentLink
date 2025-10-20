@@ -64,7 +64,7 @@ export class Login {
     const role = response.user.roles[0]?.name;
 
     if (role === 'ADMIN') {
-      this.router.navigate(['admin/dashboard']);
+      this.router.navigate(['reclutador/vacantes']);
     } else if (role === 'USER') {
       this.router.navigate(['home/dashboard']);
     } else {
