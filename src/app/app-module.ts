@@ -23,6 +23,8 @@ import { AuthInterceptor } from './auth/Interceptor/auth-interceptor';
 import { VacanteListComponent } from './reclutador/vacante-list-component/vacante-list-component';
 import { VacanteFormComponent } from './reclutador/vacante-form-component/vacante-form-component';
 import { RouterModule } from '@angular/router';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { homeMaching } from './matching/home/home';
 
 @NgModule({
   declarations: [
@@ -31,7 +33,8 @@ import { RouterModule } from '@angular/router';
     Errorpage,
     homePrinciapal,
     VacanteListComponent,
-    VacanteFormComponent
+    VacanteFormComponent,
+    homeMaching
   ],
   imports: [
     BrowserModule,
@@ -41,6 +44,7 @@ import { RouterModule } from '@angular/router';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    FormsModule ,
     MatCardModule,        // <<--- IMPORTANTE
     MatFormFieldModule,   // <<--- IMPORTANTE
     MatInputModule,        // <<--- IMPORTANTE
@@ -52,7 +56,10 @@ import { RouterModule } from '@angular/router';
     Login,
     RouterModule
   ],
-  providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
+    providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    DecimalPipe // 👈 AÑADE ESTO
+  ],
   bootstrap: [App]
 })
 export class AppModule { }
