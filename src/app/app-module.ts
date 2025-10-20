@@ -34,7 +34,8 @@ import { homeMaching } from './matching/home/home';
     homePrinciapal,
     homeMaching,
     VacanteListComponent,
-    VacanteFormComponent
+    VacanteFormComponent,
+    homeMaching
   ],
   imports: [
     BrowserModule,
@@ -43,6 +44,7 @@ import { homeMaching } from './matching/home/home';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    FormsModule ,
     MatCardModule,        // <<--- IMPORTANTE
     MatFormFieldModule,   // <<--- IMPORTANTE
     MatInputModule,        // <<--- IMPORTANTE
