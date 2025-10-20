@@ -35,6 +35,7 @@ import { RouterModule } from '@angular/router';
   ],
   imports: [
     BrowserModule,
+    CommonModule  ,
     AppRoutingModule,
     MatToolbarModule,
     MatButtonModule,

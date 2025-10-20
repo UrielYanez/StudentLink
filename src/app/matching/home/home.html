@@ -1,4 +1,243 @@
-<div class="container">
-    <p>home works!</p>
-</div>
+<div class="page-wrapper">
+  <!-- Panel de Filtros -->
+  <div class="filtros-container" [class.expanded]="mostrarFiltros">
+    <div class="filtros-header">
+      <div class="filtros-title">
+        <h3> Filtros de búsqueda</h3>
+        <span class="badge-filtros" *ngIf="hayFiltrosActivos()">{{ hayFiltrosActivos() ? 'Activos' : '' }}</span>
+      </div>
+      <button class="btn-toggle-filtros" (click)="toggleFiltros()">
+        {{ mostrarFiltros ? '▲ Ocultar' : '▼ Mostrar filtros' }}
+      </button>
+    </div>
 
+    <div class="filtros-content" *ngIf="mostrarFiltros">
+      <div class="filtros-grid">
+        <!-- Título -->
+        <div class="filtro-item">
+          <label for="titulo">Título del puesto</label>
+          <input 
+            type="text" 
+            id="titulo"
+            [(ngModel)]="filtros.titulo"
+            placeholder="Ej: Desarrollador, Contador..."
+            class="input-filtro">
+        </div>
+
+        <!-- Salario -->
+        <div class="filtro-item">
+          <label for="salario">Salario mínimo</label>
+          <input 
+            type="number" 
+            id="salario"
+            [(ngModel)]="filtros.salario"
+            placeholder="Ej: 30000"
+            class="input-filtro"
+            min="0">
+        </div>
+
+        <!-- Modalidad -->
+        <div class="filtro-item">
+          <label for="modalidad">Modalidad</label>
+          <select 
+            id="modalidad"
+            [(ngModel)]="filtros.modalidad"
+            class="select-filtro">
+            <option value="">Todas</option>
+            <option *ngFor="let mod of modalidades" [value]="mod">{{ mod }}</option>
+          </select>
+        </div>
+
+        <!-- Área -->
+        <div class="filtro-item">
+          <label for="area">Área</label>
+          <select 
+            id="area"
+            [(ngModel)]="filtros.area"
+            class="select-filtro">
+            <option value="">Todas</option>
+            <option *ngFor="let a of areas" [value]="a">{{ a }}</option>
+          </select>
+        </div>
+
+        <!-- Horario -->
+        <div class="filtro-item">
+          <label for="horario">Turno</label>
+          <select 
+            id="horario"
+            [(ngModel)]="filtros.horario"
+            class="select-filtro">
+            <option value="">Todos</option>
+            <option *ngFor="let turno of turnos" [value]="turno">{{ turno }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filtros-acciones">
+        <button 
+          class="btn-aplicar" 
+          (click)="aplicarFiltros()"
+          [disabled]="aplicandoFiltros">
+          {{ aplicandoFiltros ? 'Aplicando...' : '✓ Aplicar filtros' }}
+        </button>
+        <button 
+          class="btn-limpiar" 
+          (click)="limpiarFiltros()"
+          [disabled]="aplicandoFiltros || !hayFiltrosActivos()">
+          ✕ Limpiar filtros
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor principal con lista y detalle -->
+  <div class="home-container">
+    <!-- Lista de vacantes -->
+    <div class="lista-vacantes">
+      <div class="lista-header">
+        <h3>Vacantes disponibles</h3>
+        <p class="total-vacantes">{{ cantidadOfertas }} oportunidades</p>
+      </div>
+      
+      <div 
+        class="vacante-card" 
+        *ngFor="let oferta of ofertas" 
+        [class.selected]="oferta.id === selectedVacante?.id"
+        (click)="selectVacante(oferta)">
+        <div class="card-header">
+          <h4>{{ oferta.titulo !== 'true' ? oferta.titulo : 'Vacante' }}</h4>
+          <span class="match-badge" [class.high-match]="oferta.porcentaje_match >= 70">
+            {{ oferta.porcentaje_match }}% match
+          </span>
+        </div>
+        <p class="empresa"><strong>{{ oferta.empresa }}</strong></p>
+        <div class="card-info">
+          <span class="info-item">📍 {{ oferta.ubicacion }}</span>
+          <span class="info-item">💼 {{ oferta.modalidad }}</span>
+        </div>
+        <div class="card-footer">
+          <span class="salario">${{ oferta.salario | number }}</span>
+          <span class="horas">{{ oferta.horas_por_semana }} hrs/sem</span>
+        </div>
+      </div>
+
+      <!-- Mensaje cuando no hay resultados -->
+      <div class="no-resultados" *ngIf="ofertas.length === 0">
+        <div class="no-resultados-icon">😕</div>
+        <h4>No se encontraron vacantes</h4>
+        <p>Intenta ajustar los filtros de búsqueda</p>
+      </div>
+    </div>
+
+    <!-- Detalle de la vacante -->
+    <div class="detalle-vacante" *ngIf="selectedVacante">
+      <div class="detalle-scroll">
+        <div class="detalle-header">
+          <div class="header-content">
+            <h2>{{ selectedVacante.titulo !== 'true' ? selectedVacante.titulo : 'Vacante' }}</h2>
+            <p class="empresa-detalle">{{ selectedVacante.empresa }}</p>
+            <div class="location-info">
+              <span>📍 {{ selectedVacante.ubicacion }}</span>
+              <span class="modalidad-tag">{{ selectedVacante.modalidad }}</span>
+            </div>
+          </div>
+          <div class="match-circle">
+            <span class="match-percentage">{{ selectedVacante.porcentaje_match }}%</span>
+            <span class="match-label">Match</span>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-card">
+            <span class="info-label">Salario</span>
+            <span class="info-value" 
+                  [class.salario-bajo]="!selectedVacante.salario_match.status">
+              ${{ selectedVacante.salario_match.vacante_salario | number }}
+            </span>
+          </div>
+          <div class="info-card">
+            <span class="info-label">Horario</span>
+            <span class="info-value">{{ selectedVacante.turno }}</span>
+          </div>
+          <div class="info-card">
+            <span class="info-label">Horas semanales</span>
+            <span class="info-value">{{ selectedVacante.horas_por_semana }} hrs</span>
+          </div>
+          <div class="info-card">
+            <span class="info-label">Días laborales</span>
+            <span class="info-value">{{ selectedVacante.dias_laborales || 'No especificado' }}</span>
+          </div>
+        </div>
+
+        <!-- Habilidades requeridas -->
+        <div class="seccion" *ngIf="selectedVacante.habilidades && selectedVacante.habilidades.length > 0 && selectedVacante.habilidades[0].nombre">
+          <h3>Habilidades requeridas</h3>
+          <div class="tags-container">
+            <span 
+              *ngFor="let habilidad of selectedVacante.habilidades" 
+              class="tag"
+              [class.tag-match]="habilidad.status"
+              [class.tag-no-match]="habilidad.status === false">
+              {{ habilidad.nombre }}
+              <span class="tag-icon" *ngIf="habilidad.status">✓</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Idiomas -->
+        <div class="seccion" *ngIf="selectedVacante.idiomas && selectedVacante.idiomas.length > 0 && selectedVacante.idiomas[0].nombre">
+          <h3>Idiomas</h3>
+          <div class="tags-container">
+            <span 
+              *ngFor="let idioma of selectedVacante.idiomas" 
+              class="tag"
+              [class.tag-match]="idioma.status"
+              [class.tag-no-match]="idioma.status === false">
+              {{ idioma.nombre }}
+              <span class="tag-icon" *ngIf="idioma.status">✓</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="seccion">
+          <h3>Descripción del puesto</h3>
+          <p class="texto-descripcion">{{ selectedVacante.descripcion }}</p>
+        </div>
+
+        <!-- Beneficios -->
+        <div class="seccion">
+          <h3>Beneficios</h3>
+          <p class="texto-descripcion">{{ selectedVacante.beneficios }}</p>
+        </div>
+
+        <!-- Área match -->
+        <div class="seccion" *ngIf="selectedVacante.area_match">
+          <h3>Área profesional</h3>
+          <span 
+            class="tag"
+            [class.tag-match]="selectedVacante.area_match.status">
+            {{ selectedVacante.area_match.nombre }}
+            <span class="tag-icon" *ngIf="selectedVacante.area_match.status">✓</span>
+          </span>
+        </div>
+
+        <!-- Botón postular al final -->
+        <div class="botones-footer">
+          <button class="btn-postular">
+            <span>✓</span> Postularme a esta vacante
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje cuando no hay vacante seleccionada -->
+    <div class="detalle-vacante empty-state" *ngIf="!selectedVacante">
+      <div class="empty-content">
+        <div class="empty-icon">🔍</div>
+        <h3>Selecciona una vacante</h3>
+        <p>Haz clic en cualquier vacante de la lista para ver sus detalles completos</p>
+      </div>
+    </div>
+  </div>
+</div>
