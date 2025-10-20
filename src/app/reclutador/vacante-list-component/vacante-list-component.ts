@@ -41,28 +41,49 @@ export class VacanteListComponent implements OnInit {
     this.cargarAreas();
   }
 
-  cargarVacantes(): void {
-    console.log('📥 VacanteListComponent - Cargando vacantes...');
-    this.loading = true;
-    this.vacanteService.obtenerVacantes().subscribe({
-      next: (response) => {
-        console.log('✅ VacanteListComponent - Respuesta recibida:', response);
-        if (response.success) {
-          this.vacantes = response.data;
-          console.log(`📊 VacanteListComponent - ${this.vacantes.length} vacantes cargadas`);
-        } else {
-          this.error = response.message || 'Error al cargar vacantes';
-          console.error('❌ VacanteListComponent - Error en respuesta:', this.error);
-        }
-        this.loading = false;
-      },
-      error: (error) => {
-        this.error = 'Error de conexión: ' + error.message;
-        this.loading = false;
-        console.error('❌ VacanteListComponent - Error HTTP:', error);
-      }
+  // Método para mostrar la primera vacante (más reciente o relevante)
+mostrarPrimeraVacante(): void {
+  if (this.vacantes.length > 0) {
+    // Ordenar por fecha de creación (más reciente primero) o por relevancia
+    const vacantesOrdenadas = [...this.vacantes].sort((a, b) => {
+      // Aquí puedes cambiar el criterio de ordenación
+      return new Date(b.fechaCreacion || 0).getTime() - new Date(a.fechaCreacion || 0).getTime();
     });
+
+    this.vacanteEditando = vacantesOrdenadas[0];
+    this.isEditMode = true;
+    console.log('📋 VacanteListComponent - Mostrando primera vacante:', this.vacanteEditando.titulo);
   }
+}
+
+  // Modifica el método cargarVacantes para que siempre muestre la primera vacante
+cargarVacantes(): void {
+  console.log('📥 VacanteListComponent - Cargando vacantes...');
+  this.loading = true;
+  this.vacanteService.obtenerVacantes().subscribe({
+    next: (response) => {
+      console.log('✅ VacanteListComponent - Respuesta recibida:', response);
+      if (response.success) {
+        this.vacantes = response.data;
+        console.log(`📊 VacanteListComponent - ${this.vacantes.length} vacantes cargadas`);
+
+        // Mostrar la primera vacante al cargar
+        if (this.vacantes.length > 0) {
+          this.mostrarPrimeraVacante();
+        }
+      } else {
+        this.error = response.message || 'Error al cargar vacantes';
+        console.error('❌ VacanteListComponent - Error en respuesta:', this.error);
+      }
+      this.loading = false;
+    },
+    error: (error) => {
+      this.error = 'Error de conexión: ' + error.message;
+      this.loading = false;
+      console.error('❌ VacanteListComponent - Error HTTP:', error);
+    }
+  });
+}
 
   cargarAreas(): void {
     console.log('🔄 VacanteListComponent - Cargando áreas...');
@@ -278,16 +299,147 @@ obtenerIdiomasDeVacante(vacante: Vacante, todosIdiomas: Idioma[]): Idioma[] {
     // Por ahora solo mostramos en consola
   }
 
-  limpiarFiltros(): void {
-    console.log('🧹 VacanteListComponent - Limpiando filtros');
-    this.filtros = {
-      titulo: '',
-      empresa: '',
-      estado: '',
-      area: ''
-    };
-    this.cargarVacantes();
+  // Método para obtener la vacante más reciente
+getVacanteMasReciente(): Vacante | null {
+  if (this.vacantes.length === 0) {
+    return null;
   }
+
+  // Ordenar por fecha de creación (más reciente primero)
+  // Si no tienes fechaCreación, puedes ordenar por ID o usar el primer elemento
+  const vacantesOrdenadas = [...this.vacantes].sort((a, b) => {
+    // Si tienes fechaCreación en tu modelo
+    if (a.fechaCreacion && b.fechaCreacion) {
+      return new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime();
+    }
+    // Si no, ordenar por ID (asumiendo que IDs más altos son más recientes)
+    return (b.id || 0) - (a.id || 0);
+  });
+
+  return vacantesOrdenadas[0];
+}
+
+// cargarVacantes(): void {
+//   console.log('📥 VacanteListComponent - Cargando vacantes...');
+//   this.loading = true;
+//   this.vacanteService.obtenerVacantes().subscribe({
+//     next: (response) => {
+//       console.log('✅ VacanteListComponent - Respuesta recibida:', response);
+//       if (response.success) {
+//         this.vacantes = response.data;
+//         console.log(`📊 VacanteListComponent - ${this.vacantes.length} vacantes cargadas`);
+
+//         // Verificar y cargar relaciones faltantes
+//         this.cargarRelacionesParaVacantes();
+
+//         // Mostrar la primera vacante al cargar
+//         if (this.vacantes.length > 0) {
+//           this.mostrarPrimeraVacante();
+//         }
+//       } else {
+//         this.error = response.message || 'Error al cargar vacantes';
+//         console.error('❌ VacanteListComponent - Error en respuesta:', this.error);
+//       }
+//       this.loading = false;
+//     },
+//     error: (error) => {
+//       this.error = 'Error de conexión: ' + error.message;
+//       this.loading = false;
+//       console.error('❌ VacanteListComponent - Error HTTP:', error);
+//     }
+//   });
+// }
+
+// Método para cargar relaciones faltantes
+cargarRelacionesParaVacantes(): void {
+  console.log('🔄 VacanteListComponent - Verificando relaciones faltantes...');
+
+  // Verificar si alguna vacante tiene relaciones faltantes
+  const vacantesConRelacionesFaltantes = this.vacantes.filter(vacante =>
+    !vacante.area || !vacante.modalidad || !vacante.habilidades || !vacante.idiomas
+  );
+
+  if (vacantesConRelacionesFaltantes.length > 0) {
+    console.log(`⚠️ VacanteListComponent - ${vacantesConRelacionesFaltantes.length} vacantes necesitan relaciones`);
+
+    // Cargar todas las relaciones necesarias
+    forkJoin({
+      areas: this.vacanteService.obtenerAreas(),
+      modalidades: this.vacanteService.obtenerModalidades(),
+      habilidades: this.vacanteService.obtenerHabilidades(),
+      idiomas: this.vacanteService.obtenerIdiomas()
+    }).subscribe({
+      next: (responses) => {
+        console.log('✅ VacanteListComponent - Relaciones cargadas para vacantes');
+
+        // Actualizar cada vacante con las relaciones
+        this.vacantes = this.vacantes.map(vacante => {
+          const vacanteActualizada = {
+            ...vacante,
+            area: vacante.area || responses.areas.data.find(area => area.id === this.obtenerAreaIdDeVacante(vacante)),
+            modalidad: vacante.modalidad || responses.modalidades.data.find(mod => mod.id === this.obtenerModalidadIdDeVacante(vacante)),
+            habilidades: vacante.habilidades || this.obtenerHabilidadesDeVacante(vacante, responses.habilidades.data),
+            idiomas: vacante.idiomas || this.obtenerIdiomasDeVacante(vacante, responses.idiomas.data)
+          };
+
+          console.log('🔄 Vacante actualizada:', {
+            id: vacanteActualizada.id,
+            area: vacanteActualizada.area?.nombre,
+            modalidad: vacanteActualizada.modalidad?.nombre,
+            habilidades: vacanteActualizada.habilidades?.length,
+            idiomas: vacanteActualizada.idiomas?.length
+          });
+
+          return vacanteActualizada;
+        });
+
+        // Si estamos mostrando la primera vacante, actualizarla también
+        if (this.vacanteEditando && this.isEditMode) {
+          const vacanteActualizada = this.vacantes.find(v => v.id === this.vacanteEditando.id);
+          if (vacanteActualizada) {
+            this.vacanteEditando = vacanteActualizada;
+          }
+        }
+      },
+      error: (error) => {
+        console.error('❌ VacanteListComponent - Error cargando relaciones:', error);
+      }
+    });
+  }
+}
+
+// Método alternativo más simple si sigues teniendo problemas
+getVacantePrincipal(): Vacante | null {
+  if (!this.vacantes || this.vacantes.length === 0) {
+    return null;
+  }
+
+  // Si hay una vacante seleccionada, úsala
+  if (this.vacanteEditando && this.isEditMode) {
+    return this.vacanteEditando;
+  }
+
+  // Si no, usa la primera vacante de la lista
+  return this.vacantes[0];
+}
+
+// Método para seleccionar una vacante al hacer clic
+seleccionarVacante(vacante: Vacante): void {
+  console.log('🎯 VacanteListComponent - Seleccionando vacante:', vacante.id);
+  this.vacanteEditando = vacante;
+  this.isEditMode = true;
+}
+
+ limpiarFiltros(): void {
+  console.log('🧹 VacanteListComponent - Limpiando filtros');
+  this.filtros = {
+    titulo: '',
+    empresa: '',
+    estado: '',
+    area: ''
+  };
+  this.cargarVacantes(); // Esto ahora mostrará la primera vacante automáticamente
+}
 
   hayFiltrosActivos(): boolean {
     return !!(this.filtros.titulo || this.filtros.empresa || this.filtros.estado || this.filtros.area);

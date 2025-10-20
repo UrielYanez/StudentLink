@@ -114,7 +114,8 @@
         <div
           class="vacante-card"
           *ngFor="let vacante of vacantes"
-          [class.selected]="vacante.id === vacanteEditando?.id">
+          [class.selected]="vacante.id === vacanteEditando?.id"
+          (click)="seleccionarVacante(vacante)">
           <div class="card-header">
             <h4>{{ vacante.titulo }}</h4>
             <span class="match-badge" [class]="getEstadoBadgeClass(vacante.estado)">
@@ -125,7 +126,7 @@
           <div class="card-info">
             <span class="info-item">📍 {{ vacante.ubicacion }}</span>
             <span class="info-item">💼 {{ vacante.tipoContrato }}</span>
-            <span class="info-item">🏢 {{ vacante.area?.nombre }}</span>
+            <span class="info-item">🏢 {{ vacante.area?.nombre || 'No especificado' }}</span>
           </div>
 
           <!-- Habilidades -->
@@ -150,21 +151,21 @@
           <div class="card-actions mt-3 pt-3 border-top">
             <div class="d-flex gap-2 flex-wrap">
               <button class="btn btn-outline-primary btn-sm"
-                      (click)="abrirModalEditarVacante(vacante)">
+                      (click)="abrirModalEditarVacante(vacante); $event.stopPropagation()">
                 <i class="bi bi-pencil"></i> Editar
               </button>
               <button *ngIf="vacante.estado === 'ACTIVA'"
                       class="btn btn-outline-warning btn-sm"
-                      (click)="cambiarEstado(vacante, 'INACTIVA')">
+                      (click)="cambiarEstado(vacante, 'INACTIVA'); $event.stopPropagation()">
                 <i class="bi bi-pause"></i> Pausar
               </button>
               <button *ngIf="vacante.estado === 'INACTIVA'"
                       class="btn btn-outline-success btn-sm"
-                      (click)="cambiarEstado(vacante, 'ACTIVA')">
+                      (click)="cambiarEstado(vacante, 'ACTIVA'); $event.stopPropagation()">
                 <i class="bi bi-play"></i> Activar
               </button>
               <button class="btn btn-outline-danger btn-sm"
-                      (click)="eliminarVacante(vacante.id!)">
+                      (click)="eliminarVacante(vacante.id!); $event.stopPropagation()">
                 <i class="bi bi-trash"></i> Eliminar
               </button>
             </div>
@@ -183,97 +184,194 @@
       </div>
     </div>
 
-    <!-- Detalle de la vacante seleccionada -->
-    <div class="detalle-vacante" *ngIf="vacanteEditando && isEditMode">
-      <div class="detalle-scroll">
-        <div class="detalle-header">
-          <div class="header-content">
-            <h2>{{ vacanteEditando.titulo }}</h2>
-            <p class="empresa-detalle">{{ vacanteEditando.empresa }}</p>
-            <div class="location-info">
-              <span>📍 {{ vacanteEditando.ubicacion }}</span>
-              <span class="modalidad-tag">{{ vacanteEditando.modalidad?.nombre }}</span>
-            </div>
-          </div>
-          <div class="match-circle" [class]="getEstadoBadgeClass(vacanteEditando.estado)">
-            <span class="match-percentage">{{ getEstadoTexto(vacanteEditando.estado) }}</span>
-            <span class="match-label">Estado</span>
+    <!-- PANEL DE DETALLES - UNA SOLA VERSIÓN -->
+<div class="detalle-vacante" *ngIf="vacantes.length > 0; else emptyState">
+  <div class="detalle-scroll">
+    <!-- Mostrar vacante seleccionada o la más reciente -->
+    <div *ngIf="(vacanteEditando && isEditMode) ? vacanteEditando : getVacanteMasReciente() as vacanteActual">
+
+      <div class="detalle-header">
+        <div class="header-content">
+          <h2>{{ vacanteActual.titulo }}</h2>
+          <p class="empresa-detalle">{{ vacanteActual.empresa }}</p>
+          <div class="location-info">
+            <span>📍 {{ vacanteActual.ubicacion }}</span>
+            <span class="modalidad-tag" *ngIf="vacanteActual.modalidad?.nombre; else noModalidad">
+              {{ vacanteActual.modalidad.nombre }}
+            </span>
+            <ng-template #noModalidad>
+              <span class="modalidad-tag text-muted">Por definir</span>
+            </ng-template>
           </div>
         </div>
+        <div class="match-circle" [class]="getEstadoBadgeClass(vacanteActual.estado)">
+          <span class="match-percentage">{{ getEstadoTexto(vacanteActual.estado) }}</span>
+          <span class="match-label">Estado</span>
+        </div>
+      </div>
 
-        <div class="info-grid">
-          <div class="info-card">
-            <span class="info-label">Salario</span>
-            <span class="info-value">${{ vacanteEditando.salario | number }}</span>
+      <!-- Información extendida -->
+      <div class="info-grid-extended">
+        <div class="info-card">
+          <span class="info-label">Salario mensual</span>
+          <span class="info-value">${{ vacanteActual.salario | number }}</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Horas semanales</span>
+          <span class="info-value">{{ vacanteActual.horasPorSemana || 40 }} hrs</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Tipo de contrato</span>
+          <span class="info-value">{{ vacanteActual.tipoContrato || 'Por definir' }}</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Solicitudes permitidas</span>
+          <span class="info-value">{{ vacanteActual.solicitudesPermitidas || 50 }}</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Área profesional</span>
+          <span class="info-value" *ngIf="vacanteActual.area?.nombre; else noArea">
+            {{ vacanteActual.area.nombre }}
+          </span>
+          <ng-template #noArea>
+            <span class="info-value text-muted">Por definir</span>
+          </ng-template>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Modalidad</span>
+          <span class="info-value" *ngIf="vacanteActual.modalidad?.nombre; else noModalidadInfo">
+            {{ vacanteActual.modalidad.nombre }}
+          </span>
+          <ng-template #noModalidadInfo>
+            <span class="info-value text-muted">Por definir</span>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Horario de trabajo -->
+      <div class="seccion" *ngIf="vacanteActual.horaInicio || vacanteActual.horaFin || vacanteActual.diasLaborales || vacanteActual.turno">
+        <h3>Horario de Trabajo</h3>
+        <div class="horario-info">
+          <div *ngIf="vacanteActual.horaInicio && vacanteActual.horaFin" class="horario-item">
+            <span class="horario-label">Horario:</span>
+            <span class="horario-value">{{ vacanteActual.horaInicio }} - {{ vacanteActual.horaFin }}</span>
           </div>
-          <div class="info-card">
-            <span class="info-label">Horas semanales</span>
-            <span class="info-value">{{ vacanteEditando.horasPorSemana || 40 }} hrs</span>
+          <div *ngIf="vacanteActual.diasLaborales" class="horario-item">
+            <span class="horario-label">Días laborales:</span>
+            <span class="horario-value">{{ vacanteActual.diasLaborales }}</span>
           </div>
-          <div class="info-card">
-            <span class="info-label">Tipo de contrato</span>
-            <span class="info-value">{{ vacanteEditando.tipoContrato }}</span>
+          <div *ngIf="vacanteActual.turno" class="horario-item">
+            <span class="horario-label">Turno:</span>
+            <span class="horario-value">{{ vacanteActual.turno }}</span>
           </div>
-          <div class="info-card">
-            <span class="info-label">Solicitudes</span>
-            <span class="info-value">{{ vacanteEditando.solicitudesPermitidas }} permitidas</span>
+          <div *ngIf="vacanteActual.horarioFlexible" class="horario-item">
+            <span class="horario-label badge bg-success">Horario flexible</span>
+          </div>
+          <div *ngIf="!vacanteActual.horaInicio && !vacanteActual.diasLaborales && !vacanteActual.turno" class="horario-item">
+            <span class="text-muted">Información de horario por definir</span>
           </div>
         </div>
+      </div>
 
-        <!-- Descripción -->
+      <!-- Descripción -->
+      <div class="seccion" *ngIf="vacanteActual.descripcion">
+        <h3>Descripción del puesto</h3>
+        <p class="texto-descripcion">{{ vacanteActual.descripcion }}</p>
+      </div>
+
+      <!-- Habilidades -->
+      <div class="seccion" *ngIf="vacanteActual.habilidades && vacanteActual.habilidades.length > 0; else noHabilidades">
+        <h3>Habilidades requeridas</h3>
+        <div class="tags-container">
+          <span *ngFor="let habilidad of vacanteActual.habilidades"
+                class="tag tag-match">
+            {{ habilidad.nombre }}
+          </span>
+        </div>
+      </div>
+      <ng-template #noHabilidades>
         <div class="seccion">
-          <h3>Descripción del puesto</h3>
-          <p class="texto-descripcion">{{ vacanteEditando.descripcion }}</p>
-        </div>
-
-        <!-- Habilidades -->
-        <div class="seccion" *ngIf="vacanteEditando.habilidades && vacanteEditando.habilidades.length > 0">
           <h3>Habilidades requeridas</h3>
-          <div class="tags-container">
-            <span *ngFor="let habilidad of vacanteEditando.habilidades"
-                  class="tag tag-match">
-              {{ habilidad.nombre }}
-            </span>
-          </div>
+          <p class="text-muted">No se han especificado habilidades para este puesto</p>
         </div>
+      </ng-template>
 
-        <!-- Idiomas -->
-        <div class="seccion" *ngIf="vacanteEditando.idiomas && vacanteEditando.idiomas.length > 0">
-          <h3>Idiomas</h3>
-          <div class="tags-container">
-            <span *ngFor="let idioma of vacanteEditando.idiomas"
-                  class="tag tag-match">
-              {{ idioma.idioma }}
-            </span>
-          </div>
+      <!-- Idiomas -->
+      <div class="seccion" *ngIf="vacanteActual.idiomas && vacanteActual.idiomas.length > 0; else noIdiomas">
+        <h3>Idiomas requeridos</h3>
+        <div class="tags-container">
+          <span *ngFor="let idioma of vacanteActual.idiomas"
+                class="tag tag-match">
+            {{ idioma.idioma }}
+          </span>
         </div>
-
-        <!-- Beneficios -->
-        <div class="seccion" *ngIf="vacanteEditando.beneficios">
-          <h3>Beneficios</h3>
-          <p class="texto-descripcion">{{ vacanteEditando.beneficios }}</p>
+      </div>
+      <ng-template #noIdiomas>
+        <div class="seccion">
+          <h3>Idiomas requeridos</h3>
+          <p class="text-muted">No se han especificado idiomas para este puesto</p>
         </div>
+      </ng-template>
 
-        <!-- Botones de acción en detalle -->
-        <div class="botones-footer">
-          <button class="btn btn-primary btn-sm" (click)="abrirModalEditarVacante(vacanteEditando)">
-            <i class="bi bi-pencil"></i> Editar Vacante
+      <!-- Beneficios -->
+      <div class="seccion" *ngIf="vacanteActual.beneficios; else noBeneficios">
+        <h3>Beneficios adicionales</h3>
+        <p class="texto-descripcion">{{ vacanteActual.beneficios }}</p>
+      </div>
+      <ng-template #noBeneficios>
+        <div class="seccion">
+          <h3>Beneficios adicionales</h3>
+          <p class="text-muted">No se han especificado beneficios adicionales</p>
+        </div>
+      </ng-template>
+
+      <!-- Fecha de expiración -->
+      <div class="seccion" *ngIf="vacanteActual.fechaExpiracion">
+        <h3>Vigencia de la vacante</h3>
+        <div class="fecha-expiracion">
+          <span class="fecha-label">Fecha de expiración:</span>
+          <span class="fecha-value">{{ vacanteActual.fechaExpiracion | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="botones-footer">
+        <button class="btn btn-primary" (click)="abrirModalEditarVacante(vacanteActual)">
+          <i class="bi bi-pencil"></i> Editar Vacante
+        </button>
+        <button class="btn btn-outline-secondary"
+                (click)="cambiarEstado(vacanteActual, vacanteActual.estado === 'ACTIVA' ? 'INACTIVA' : 'ACTIVA')">
+          <i class="bi" [class]="vacanteActual.estado === 'ACTIVA' ? 'bi-pause' : 'bi-play'"></i>
+          {{ vacanteActual.estado === 'ACTIVA' ? 'Pausar' : 'Activar' }}
+        </button>
+        <button class="btn btn-outline-danger"
+                (click)="eliminarVacante(vacanteActual.id!)">
+          <i class="bi bi-trash"></i> Eliminar
+        </button>
+      </div>
+
+      <!-- Mensaje informativo cuando se muestra la vacante más reciente -->
+      <div class="alert alert-info mt-4" *ngIf="!vacanteEditando || !isEditMode">
+        <i class="bi bi-info-circle me-2"></i>
+        Esta es la vacante más reciente. Haz clic en cualquier vacante de la lista para ver sus detalles.
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Empty State Template -->
+    <ng-template #emptyState>
+      <div class="detalle-vacante empty-state">
+        <div class="empty-content">
+          <div class="empty-icon">📋</div>
+          <h3>Gestión de Vacantes</h3>
+          <p>Selecciona una vacante para ver sus detalles o crea una nueva</p>
+          <button class="btn btn-primary mt-3" (click)="abrirModalNuevaVacante()">
+            <i class="bi bi-plus-circle"></i> Crear Nueva Vacante
           </button>
         </div>
       </div>
-    </div>
-
-    <!-- Mensaje cuando no hay vacante seleccionada -->
-    <div class="detalle-vacante empty-state" *ngIf="!vacanteEditando || !isEditMode">
-      <div class="empty-content">
-        <div class="empty-icon">📋</div>
-        <h3>Gestión de Vacantes</h3>
-        <p>Selecciona una vacante para ver sus detalles o crea una nueva</p>
-        <button class="btn btn-primary mt-3" (click)="abrirModalNuevaVacante()">
-          <i class="bi bi-plus-circle"></i> Crear Nueva Vacante
-        </button>
-      </div>
-    </div>
+    </ng-template>
   </div>
 </div>
 
