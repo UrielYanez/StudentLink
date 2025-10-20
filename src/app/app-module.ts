@@ -23,6 +23,7 @@ import { AuthInterceptor } from './auth/Interceptor/auth-interceptor';
 import { VacanteListComponent } from './reclutador/vacante-list-component/vacante-list-component';
 import { VacanteFormComponent } from './reclutador/vacante-form-component/vacante-form-component';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
