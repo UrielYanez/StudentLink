@@ -28,7 +28,6 @@ export class Nabvar implements OnInit, OnDestroy {
   constructor(private router: Router, private usuarioContext: UsuarioContextService) {}
 
   ngOnInit(): void {
-    // Suscribirse a los cambios de usuario
     const sub1 = this.usuarioContext.username$.subscribe(name => {
       this.userName = name;
       this.isLoggedIn = !!name;
@@ -38,6 +37,27 @@ export class Nabvar implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  // Obtener las iniciales del usuario (máximo 2 letras)
+  getUserInitials(): string {
+    if (!this.userName) return '';
+    
+    const names = this.userName.trim().split(' ');
+    if (names.length >= 2) {
+      return (names[0][0] + names[1][0]).toUpperCase();
+    }
+    return this.userName.substring(0, 2).toUpperCase();
+  }
+
+  // Truncar nombre si tiene más de 10 caracteres
+  getDisplayName(): string {
+    if (!this.userName) return '';
+    
+    if (this.userName.length > 10) {
+      return this.userName.substring(0, 14) ;
+    }
+    return this.userName;
   }
 
   shouldShowOptions(): boolean {

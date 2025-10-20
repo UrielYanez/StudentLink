@@ -1,91 +1,276 @@
 .navbar {
   display: flex;
   align-items: center;
-  padding: 0 24px; /* Increased padding for more space */
+  padding: 0 32px;
+  height: 64px;
+  
+  // Gradiente moderno y elegante
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: fadeInDown 0.5s ease-out;
+  
+  // Efecto de brillo sutil
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.3) 50%, 
+      transparent 100%
+    );
+  }
 
-  /* Modernized color palette - Deep Blue/Navy as primary, light gray background on scroll */
-  background-color: #1a237e; /* Darker, more professional blue */
-  color: #ffffff; /* White text for high contrast */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  .container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
 
   .logo {
-    font-weight: 700; /* Bolder */
-    font-size: 22px; /* Slightly larger */
-    letter-spacing: 0.5px; /* Better readability */
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 0.5px;
     cursor: pointer;
     text-decoration: none;
-    color: inherit;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.3s ease, text-shadow 0.3s ease;
+    
+    // &::before {
+    //   content: '🎓';
+    //   font-size: 28px;
+    // }
+
+    &:hover {
+      transform: translateY(-2px);
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
   }
 
   .spacer {
     flex: 1 1 auto;
   }
 
-  /* --- General Button Styling --- */
+  // Botones generales con estilo mejorado
   a[mat-button],
   a[mat-stroked-button],
-  a[mat-flat-button] {
-    margin: 0 10px; /* Increased margin between buttons */
+  button[mat-button] {
+    margin: 0 6px;
     text-decoration: none;
-    font-weight: 500; /* Medium weight */
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    border-radius: 4px; /* Rounded corners */
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+    text-transform: none;
+    letter-spacing: 0.3px;
   }
 
-  /* --- Login Button (mat-button) - Secondary Action, Text style --- */
-  a[mat-button] {
-    color: inherit; /* White text */
-    opacity: 0.9; /* Slightly less opaque to distinguish from logo */
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1); /* Light hover effect */
-      opacity: 1;
-    }
-  }
-
-  /* --- Register Button (mat-stroked-button) - Primary Action, Outlined style --- */
+  // Botón de Iniciar Sesión (estilo glassmorphism)
   a[mat-stroked-button] {
-    color: #ffd740; /* Vibrant accent color for the outline */
-    border: 1px solid #ffd740; /* Accent border */
-    padding: 6px 16px; /* Define padding for outlined button */
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 8px 24px;
+    font-size: 14px;
 
     &:hover {
-      background-color: #ffd740; /* Accent color fill on hover */
-      color: #1a237e; /* Darker text on hover for contrast */
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+      transform: translateY(0);
     }
   }
-  
-  /* --- User Menu Button (Logged in) --- */
+
+  // Usuario logueado - Menú de perfil
   .navbar-right {
     display: flex;
     align-items: center;
+    gap: 12px;
 
-    button[mat-button] {
-      color: inherit;
-      text-transform: none;
-      padding: 6px 12px;
-      border-radius: 4px;
+  .user-button {
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: row !important; // fuerza horizontal
+  justify-content: flex-start;
+  gap: 10px !important;
+  padding: 6px 14px !important;
+  border-radius: 24px;
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  text-transform: none;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 44px;
+  line-height: normal !important; // elimina altura extra del mat-button
 
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.15); /* Light hover background */
-        /* Removed the border on hover for a cleaner look */
+  .mdc-button__label {
+    display: flex;
+    align-items: center;
+    flex-direction: row !important;
+    gap: 10px;
+  }
+
+  .user-avatar {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  }
+
+  .user-name {
+    flex: 1;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &:hover {
+    background: rgba(21, 59, 184, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+}
+
+  }
+}
+
+// Avatar con iniciales
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  flex-shrink: 0;
+}
+
+.user-name {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+// Estilos del menú desplegable
+::ng-deep {
+  .mat-mdc-menu-panel {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 8px;
+    background: #ffffff;
+  }
+
+  .mat-mdc-menu-content {
+    padding: 8px 0;
+  }
+
+  .mat-mdc-menu-item {
+    font-size: 14px;
+    color: #1e293b;
+    padding: 12px 20px;
+    transition: all 0.2s ease;
+    min-height: 48px;
+
+    .mat-icon {
+      margin-right: 12px;
+      color: #667eea;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover {
+      background: linear-gradient(90deg, #f8f9ff 0%, #f1f3ff 100%);
+      
+      .mat-icon {
+        transform: scale(1.1);
+      }
+    }
+
+    &:last-child {
+      border-top: 1px solid #e2e8f0;
+      margin-top: 4px;
+      color: #dc2626;
+
+      .mat-icon {
+        color: #dc2626;
       }
     }
   }
 }
 
-/* --- Mat Menu Styling for consistency (Optional but recommended) --- */
-.mat-mdc-menu-panel {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+// Responsive
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
+    height: 56px;
+
+    .logo {
+      font-size: 20px;
+      
+      &::before {
+        font-size: 24px;
+      }
+    }
+
+    a[mat-stroked-button],
+    .user-button {
+      padding: 6px 16px;
+      font-size: 13px;
+    }
+
+    .user-name {
+      display: none;
+    }
+
+    .user-avatar {
+      margin-right: 0;
+    }
+  }
 }
 
-.mat-mdc-menu-item {
-  font-size: 14px;
-  color: #1a237e; /* Dark blue text */
-  &:hover {
-    background-color: #f0f0f0; /* Light gray hover */
+// Animación de carga
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
-  mat-icon {
-    margin-right: 8px;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+::ng-deep .mdc-button__label {
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: row !important;
+  gap: 10px !important;
 }

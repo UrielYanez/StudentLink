@@ -1,12 +1,12 @@
-
 <mat-toolbar class="navbar">
   <div class="container">
   <a class="logo" routerLink="/home">StudentLink</a>
   <span class="spacer"></span>
 
   <div class="navbar-right" *ngIf="shouldShowOptions() && isLoggedIn">
-    <button mat-button [matMenuTriggerFor]="userMenu">
-      {{ userName }}
+    <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+      <div class="user-avatar">{{ getUserInitials() }}</div>
+      <span class="user-name">{{ getDisplayName() }}</span>
     </button>
     <mat-menu #userMenu="matMenu">
       <button mat-menu-item (click)="goToProfile()">
