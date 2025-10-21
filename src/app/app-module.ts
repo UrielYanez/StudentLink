@@ -25,6 +25,7 @@ import { VacanteFormComponent } from './reclutador/vacante-form-component/vacant
 import { RouterModule } from '@angular/router';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { homeMaching } from './matching/home/home';
+import { Maching } from './service/maching';
 
 @NgModule({
   declarations: [
@@ -60,7 +61,8 @@ import { homeMaching } from './matching/home/home';
     FormsModule
   ],
   providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    DecimalPipe
+    DecimalPipe,
+    Maching
   ],
   bootstrap: [App]
 })

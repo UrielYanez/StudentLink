@@ -1,3 +1,5 @@
+import { VacanteMatch } from "./maching";
+
 export interface Vacante {
   id?: number;
   titulo: string;
@@ -21,6 +23,27 @@ export interface Vacante {
   modalidad?: Modalidad;
   habilidades?: Habilidad[];
   idiomas?: Idioma[];
+  // Agrega esta propiedad para el matching
+  // matching?: VacanteMatch[];
+  // 🔥 NUEVO: Campos para matching y postulados
+  postulados?: any[];
+  porcentajeMatch?: number;
+  habilidadesMatch?: any[];
+  idiomasMatch?: any[];
+  areaMatch?: any;
+  salarioMatch?: any;
+}
+
+// 🔥 NUEVO: Interfaces para postulados y matching
+export interface Postulado {
+  usuario_id: number;
+  username: string;
+  email: string;
+  salario: number;
+  area: string;
+  habilidades: string[];
+  idiomas: string[];
+  porcentaje_match: number;
 }
 
 export interface VacanteRequest {
@@ -44,6 +67,27 @@ export interface VacanteRequest {
   modalidadId: number;
   habilidadesIds: number[];
   idiomasIds: number[];
+}
+
+export interface VacanteConPostulados {
+  vacante_id: number;
+  titulo: string;
+  empresa: string;
+  salario: number;
+  area: string;
+  modalidad: string;
+  habilidades: string[];
+  idiomas: string[];
+  descripcion: string;
+  ubicacion: string;
+  tipoContrato: string;
+  solicitudesPermitidas: number;
+  estado: string;
+  diasLaborales: string;
+  horasSemanales: number;
+  turno: string;
+  horarioFlexible: boolean;
+  postulados: Postulado[];
 }
 
 export interface Area {

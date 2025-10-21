@@ -8,6 +8,18 @@ export interface MatchingRequest {
   horario?: string;
 }
 
+// 🔥 NUEVO: Interface para postulados
+export interface PostuladoMatch {
+  usuario_id: number;
+  username: string;
+  email: string;
+  salario: number;
+  area: string;
+  habilidades: string[];
+  idiomas: string[];
+  porcentaje_match: number;
+}
+
 export interface Habilidad {
   nombre: string | null;
   status: boolean | null;
@@ -48,4 +60,6 @@ export interface VacanteMatch {
   area_match: AreaMatch;
   salario_match: SalarioMatch;
   porcentaje_match: number;
+  // 🔥 NUEVO: Campo para postulados (solo en tipo 2)
+  postulados?: PostuladoMatch[];
 }
