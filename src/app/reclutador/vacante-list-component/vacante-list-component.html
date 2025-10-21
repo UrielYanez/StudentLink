@@ -24,17 +24,6 @@
             class="input-filtro">
         </div>
 
-        <!-- Empresa -->
-        <div class="filtro-item">
-          <label for="empresa">Empresa</label>
-          <input
-            type="text"
-            id="empresa"
-            [(ngModel)]="filtros.empresa"
-            placeholder="Nombre de la empresa"
-            class="input-filtro">
-        </div>
-
         <!-- Estado -->
         <div class="filtro-item">
           <label for="estado">Estado</label>
@@ -47,18 +36,6 @@
             <option value="INACTIVA">Inactiva</option>
             <option value="CERRADA">Cerrada</option>
             <option value="CANCELADA">Cancelada</option>
-          </select>
-        </div>
-
-        <!-- Área -->
-        <div class="filtro-item">
-          <label for="area">Área</label>
-          <select
-            id="area"
-            [(ngModel)]="filtros.area"
-            class="select-filtro">
-            <option value="">Todas</option>
-            <option *ngFor="let area of areas" [value]="area.nombre">{{ area.nombre }}</option>
           </select>
         </div>
       </div>
@@ -79,299 +56,524 @@
     </div>
   </div>
 
+  <!-- Navegación por pestañas -->
+  <div class="tabs-navigation">
+    <div class="tabs-container">
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'vacantes'"
+        (click)="cambiarTab('vacantes')">
+        <i class="bi bi-briefcase me-2"></i>
+        Mis Vacantes
+        <!-- <span class="tab-badge">{{ vacantes.length }}</span> -->
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'postulados'"
+        (click)="cambiarTab('postulados')">
+        <i class="bi bi-people me-2"></i>
+        Postulados
+        <!-- <span class="tab-badge">{{ getVacantesConPostulados().length }}</span> -->
+      </button>
+    </div>
+  </div>
+
   <!-- Contenedor principal -->
   <div class="home-container">
-    <!-- Lista de vacantes -->
-    <div class="lista-vacantes">
-      <div class="lista-header">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h3>Gestión de Vacantes</h3>
-            <p class="total-vacantes">{{ vacantes.length }} {{ vacantes.length === 1 ? 'vacante' : 'vacantes' }}</p>
+
+    <!-- PESTAÑA: MIS VACANTES -->
+    <div *ngIf="activeTab === 'vacantes'" class="home-container-vacantes">
+      <!-- Lista de vacantes (LADO IZQUIERDO) -->
+      <div class="lista-vacantes">
+        <div class="lista-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h3>Gestión de Vacantes</h3>
+              <p class="total-vacantes">
+        {{ vacantesFiltradas.length }} {{ vacantesFiltradas.length === 1 ? 'vacante' : 'vacantes' }}
+        de <strong>{{ empresaEspecifica }}</strong>
+      </p>
+              <!-- <p class="total-vacantes">{{ vacantes.length }} {{ vacantes.length === 1 ? 'vacante' : 'vacantes' }}</p> -->
+            </div>
+            <button class="btn btn-primary btn-nueva-vacante" (click)="abrirModalNuevaVacante()">
+              <i class="bi bi-plus-circle"></i> Nueva Vacante
+            </button>
           </div>
-          <button class="btn btn-primary btn-nueva-vacante" (click)="abrirModalNuevaVacante()">
-            <i class="bi bi-plus-circle"></i> Nueva Vacante
-          </button>
         </div>
-      </div>
 
-      <!-- Loading -->
-      <div *ngIf="loading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Cargando...</span>
+        <!-- Loading -->
+        <div *ngIf="loading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="mt-2 text-muted">Cargando vacantes...</p>
         </div>
-        <p class="mt-2 text-muted">Cargando vacantes...</p>
-      </div>
 
-      <!-- Error -->
-      <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ error }}
-        <button type="button" class="btn-close" (click)="error = ''"></button>
-      </div>
+        <!-- Error -->
+        <div *ngIf="error && !loading" class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ error }}
+          <button type="button" class="btn-close" (click)="error = ''"></button>
+        </div>
 
-      <!-- Lista de vacantes -->
-      <div *ngIf="!loading && vacantes.length > 0">
-        <div
-          class="vacante-card"
-          *ngFor="let vacante of vacantes"
-          [class.selected]="vacante.id === vacanteEditando?.id"
-          (click)="seleccionarVacante(vacante)">
-          <div class="card-header">
-            <h4>{{ vacante.titulo }}</h4>
-            <span class="match-badge" [class]="getEstadoBadgeClass(vacante.estado)">
-              {{ getEstadoTexto(vacante.estado) }}
-            </span>
-          </div>
-          <p class="empresa"><strong>{{ vacante.empresa }}</strong></p>
-          <div class="card-info">
-            <span class="info-item">📍 {{ vacante.ubicacion }}</span>
-            <span class="info-item">💼 {{ vacante.tipoContrato }}</span>
-            <span class="info-item">🏢 {{ vacante.area?.nombre || 'No especificado' }}</span>
-          </div>
-
-          <!-- Habilidades -->
-          <div *ngIf="vacante.habilidades && vacante.habilidades.length > 0" class="mb-2">
-            <div class="habilidades-mini">
-              <span *ngFor="let habilidad of vacante.habilidades.slice(0, 3)"
-                    class="badge bg-info me-1">
-                {{ habilidad.nombre }}
-              </span>
-              <span *ngIf="vacante.habilidades.length > 3" class="text-muted">
-                +{{ vacante.habilidades.length - 3 }} más
+        <!-- Lista de vacantes -->
+        <div *ngIf="!loading && vacantesFiltradas.length > 0">
+  <div
+    class="vacante-card"
+    *ngFor="let vacante of vacantesFiltradas"
+    [class.selected]="vacante.id === vacanteEditando?.id"
+    (click)="seleccionarVacante(vacante)">
+            <div class="card-header">
+              <h4>{{ vacante.titulo }}</h4>
+              <span class="match-badge" [class]="getEstadoBadgeClass(vacante.estado)">
+                {{ getEstadoTexto(vacante.estado) }}
               </span>
             </div>
-          </div>
+            <p class="empresa"><strong>{{ vacante.empresa }}</strong></p>
+            <div class="card-info">
+              <span class="info-item">📍 {{ vacante.ubicacion }}</span>
+              <span class="info-item">💼 {{ vacante.tipoContrato }}</span>
+              <span class="info-item">🏢 {{ vacante.area?.nombre || 'No especificado' }}</span>
+            </div>
 
-          <div class="card-footer">
-            <span class="salario">${{ vacante.salario | number }}</span>
-            <span class="horas">{{ vacante.horasPorSemana || 40 }} hrs/sem</span>
-          </div>
+            <!-- Habilidades -->
+            <div *ngIf="vacante.habilidades && vacante.habilidades.length > 0" class="mb-2">
+              <div class="habilidades-mini">
+                <span *ngFor="let habilidad of vacante.habilidades.slice(0, 3)"
+                      class="badge bg-info me-1">
+                  {{ habilidad.nombre }}
+                </span>
+                <span *ngIf="vacante.habilidades.length > 3" class="text-muted">
+                  +{{ vacante.habilidades.length - 3 }} más
+                </span>
+              </div>
+            </div>
 
-          <!-- Botones de acción -->
-          <div class="card-actions mt-3 pt-3 border-top">
-            <div class="d-flex gap-2 flex-wrap">
-              <button class="btn btn-outline-primary btn-sm"
-                      (click)="abrirModalEditarVacante(vacante); $event.stopPropagation()">
-                <i class="bi bi-pencil"></i> Editar
+            <div class="card-footer">
+              <span class="salario">${{ vacante.salario | number }}</span>
+              <span class="horas">{{ vacante.horasPorSemana || 40 }} hrs/sem</span>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="card-actions mt-3 pt-3 border-top">
+              <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-outline-primary btn-sm"
+                        (click)="abrirModalEditarVacante(vacante); $event.stopPropagation()">
+                  <i class="bi bi-pencil"></i> Editar
+                </button>
+                <button *ngIf="vacante.estado === 'ACTIVA'"
+                        class="btn btn-outline-warning btn-sm"
+                        (click)="cambiarEstado(vacante, 'INACTIVA'); $event.stopPropagation()">
+                  <i class="bi bi-pause"></i> Pausar
+                </button>
+                <button *ngIf="vacante.estado === 'INACTIVA'"
+                        class="btn btn-outline-success btn-sm"
+                        (click)="cambiarEstado(vacante, 'ACTIVA'); $event.stopPropagation()">
+                  <i class="bi bi-play"></i> Activar
+                </button>
+                <button class="btn btn-outline-danger btn-sm"
+                        (click)="eliminarVacante(vacante.id!); $event.stopPropagation()">
+                  <i class="bi bi-trash"></i> Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && vacantesFiltradas.length === 0" class="text-center py-5">
+  <i class="bi bi-briefcase display-1 text-muted"></i>
+  <h4 class="text-muted mt-3" *ngIf="hayFiltrosActivos()">No hay vacantes que coincidan con los filtros</h4>
+  <h4 class="text-muted mt-3" *ngIf="!hayFiltrosActivos()">No hay vacantes registradas</h4>
+  <p class="text-muted" *ngIf="hayFiltrosActivos()">Intenta ajustar los filtros de búsqueda</p>
+  <p class="text-muted" *ngIf="!hayFiltrosActivos()">Comienza creando tu primera vacante</p>
+  <button class="btn btn-primary" (click)="abrirModalNuevaVacante()">
+    <i class="bi bi-plus-circle"></i>
+    {{ hayFiltrosActivos() ? 'Crear Nueva Vacante' : 'Crear Primera Vacante' }}
+  </button>
+  <button *ngIf="hayFiltrosActivos()" class="btn btn-outline-secondary ms-2" (click)="limpiarFiltros()">
+    <i class="bi bi-x-circle"></i> Limpiar Filtros
+  </button>
+</div>
+      </div>
+
+      <!-- Panel de detalles de vacante (LADO DERECHO) -->
+      <div class="detalle-vacante" *ngIf="vacantes.length > 0; else emptyState">
+        <div class="detalle-scroll">
+          <!-- Mostrar vacante seleccionada o la más reciente -->
+          <div *ngIf="(vacanteEditando && isEditMode) ? vacanteEditando : getVacanteMasReciente() as vacanteActual">
+
+            <div class="detalle-header">
+              <div class="header-content">
+                <h2>{{ vacanteActual.titulo }}</h2>
+                <p class="empresa-detalle">{{ vacanteActual.empresa }}</p>
+                <div class="location-info">
+                  <span>📍 {{ vacanteActual.ubicacion }}</span>
+                  <span class="modalidad-tag" *ngIf="vacanteActual.modalidad?.nombre; else noModalidad">
+                    {{ vacanteActual.modalidad.nombre }}
+                  </span>
+                  <ng-template #noModalidad>
+                    <span class="modalidad-tag text-muted">Por definir</span>
+                  </ng-template>
+                </div>
+              </div>
+              <div class="match-circle" [class]="getEstadoBadgeClass(vacanteActual.estado)">
+                <span class="match-percentage">{{ getEstadoTexto(vacanteActual.estado) }}</span>
+                <span class="match-label">Estado</span>
+              </div>
+            </div>
+
+            <!-- Información extendida -->
+            <div class="info-grid-extended">
+              <div class="info-card">
+                <span class="info-label">Salario mensual</span>
+                <span class="info-value">${{ vacanteActual.salario | number }}</span>
+              </div>
+              <div class="info-card">
+                <span class="info-label">Horas semanales</span>
+                <span class="info-value">{{ vacanteActual.horasPorSemana || 40 }} hrs</span>
+              </div>
+              <div class="info-card">
+                <span class="info-label">Tipo de contrato</span>
+                <span class="info-value">{{ vacanteActual.tipoContrato || 'Por definir' }}</span>
+              </div>
+              <div class="info-card">
+                <span class="info-label">Solicitudes permitidas</span>
+                <span class="info-value">{{ vacanteActual.solicitudesPermitidas || 50 }}</span>
+              </div>
+              <div class="info-card">
+  <span class="info-label">Área profesional</span>
+  <span class="info-value" *ngIf="vacanteActual.area?.nombre; else noArea">
+    {{ vacanteActual.area.nombre }}
+  </span>
+  <ng-template #noArea>
+    <span class="info-value text-muted">Por definir</span>
+  </ng-template>
+</div>
+              <div class="info-card">
+                <span class="info-label">Modalidad</span>
+                <span class="info-value" *ngIf="vacanteActual.modalidad?.nombre; else noModalidadInfo">
+                  {{ vacanteActual.modalidad.nombre }}
+                </span>
+                <ng-template #noModalidadInfo>
+                  <span class="info-value text-muted">Por definir</span>
+                </ng-template>
+              </div>
+            </div>
+
+            <!-- Horario de trabajo -->
+            <div class="seccion" *ngIf="vacanteActual.horaInicio || vacanteActual.horaFin || vacanteActual.diasLaborales || vacanteActual.turno">
+              <h3>Horario de Trabajo</h3>
+              <div class="horario-info">
+                <div *ngIf="vacanteActual.horaInicio && vacanteActual.horaFin" class="horario-item">
+                  <span class="horario-label">Horario:</span>
+                  <span class="horario-value">{{ vacanteActual.horaInicio }} - {{ vacanteActual.horaFin }}</span>
+                </div>
+                <div *ngIf="vacanteActual.diasLaborales" class="horario-item">
+                  <span class="horario-label">Días laborales:</span>
+                  <span class="horario-value">{{ vacanteActual.diasLaborales }}</span>
+                </div>
+                <div *ngIf="vacanteActual.turno" class="horario-item">
+                  <span class="horario-label">Turno:</span>
+                  <span class="horario-value">{{ vacanteActual.turno }}</span>
+                </div>
+                <div *ngIf="vacanteActual.horarioFlexible" class="horario-item">
+                  <span class="horario-label badge bg-success">Horario flexible</span>
+                </div>
+                <div *ngIf="!vacanteActual.horaInicio && !vacanteActual.diasLaborales && !vacanteActual.turno" class="horario-item">
+                  <span class="text-muted">Información de horario por definir</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="seccion" *ngIf="vacanteActual.descripcion">
+              <h3>Descripción del puesto</h3>
+              <p class="texto-descripcion">{{ vacanteActual.descripcion }}</p>
+            </div>
+
+            <!-- Habilidades -->
+            <div class="seccion" *ngIf="vacanteActual.habilidades && vacanteActual.habilidades.length > 0; else noHabilidades">
+              <h3>Habilidades requeridas</h3>
+              <div class="tags-container">
+                <span *ngFor="let habilidad of vacanteActual.habilidades"
+                      class="tag tag-match">
+                  {{ habilidad.nombre }}
+                </span>
+              </div>
+            </div>
+            <ng-template #noHabilidades>
+              <div class="seccion">
+                <h3>Habilidades requeridas</h3>
+                <p class="text-muted">No se han especificado habilidades para este puesto</p>
+              </div>
+            </ng-template>
+
+            <!-- Idiomas -->
+            <div class="seccion" *ngIf="vacanteActual.idiomas && vacanteActual.idiomas.length > 0; else noIdiomas">
+              <h3>Idiomas requeridos</h3>
+              <div class="tags-container">
+                <span *ngFor="let idioma of vacanteActual.idiomas"
+                      class="tag tag-match">
+                  {{ idioma.idioma }}
+                </span>
+              </div>
+            </div>
+            <ng-template #noIdiomas>
+              <div class="seccion">
+                <h3>Idiomas requeridos</h3>
+                <p class="text-muted">No se han especificado idiomas para este puesto</p>
+              </div>
+            </ng-template>
+
+            <!-- Beneficios -->
+            <div class="seccion" *ngIf="vacanteActual.beneficios; else noBeneficios">
+              <h3>Beneficios adicionales</h3>
+              <p class="texto-descripcion">{{ vacanteActual.beneficios }}</p>
+            </div>
+            <ng-template #noBeneficios>
+              <div class="seccion">
+                <h3>Beneficios adicionales</h3>
+                <p class="text-muted">No se han especificado beneficios adicionales</p>
+              </div>
+            </ng-template>
+
+            <!-- Fecha de expiración -->
+            <div class="seccion" *ngIf="vacanteActual.fechaExpiracion">
+              <h3>Vigencia de la vacante</h3>
+              <div class="fecha-expiracion">
+                <span class="fecha-label">Fecha de expiración:</span>
+                <span class="fecha-value">{{ vacanteActual.fechaExpiracion | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="botones-footer">
+              <button class="btn btn-primary" (click)="abrirModalEditarVacante(vacanteActual)">
+                <i class="bi bi-pencil"></i> Editar Vacante
               </button>
-              <button *ngIf="vacante.estado === 'ACTIVA'"
-                      class="btn btn-outline-warning btn-sm"
-                      (click)="cambiarEstado(vacante, 'INACTIVA'); $event.stopPropagation()">
-                <i class="bi bi-pause"></i> Pausar
+              <button class="btn btn-outline-secondary"
+                      (click)="cambiarEstado(vacanteActual, vacanteActual.estado === 'ACTIVA' ? 'INACTIVA' : 'ACTIVA')">
+                <i class="bi" [class]="vacanteActual.estado === 'ACTIVA' ? 'bi-pause' : 'bi-play'"></i>
+                {{ vacanteActual.estado === 'ACTIVA' ? 'Pausar' : 'Activar' }}
               </button>
-              <button *ngIf="vacante.estado === 'INACTIVA'"
-                      class="btn btn-outline-success btn-sm"
-                      (click)="cambiarEstado(vacante, 'ACTIVA'); $event.stopPropagation()">
-                <i class="bi bi-play"></i> Activar
-              </button>
-              <button class="btn btn-outline-danger btn-sm"
-                      (click)="eliminarVacante(vacante.id!); $event.stopPropagation()">
+              <button class="btn btn-outline-danger"
+                      (click)="eliminarVacante(vacanteActual.id!)">
                 <i class="bi bi-trash"></i> Eliminar
               </button>
             </div>
+
+            <!-- Mensaje informativo cuando se muestra la vacante más reciente -->
+            <div class="alert alert-info mt-4" *ngIf="!vacanteEditando || !isEditMode">
+              <i class="bi bi-info-circle me-2"></i>
+              Esta es la vacante más reciente. Haz clic en cualquier vacante de la lista para ver sus detalles.
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Empty State -->
-      <div *ngIf="!loading && vacantes.length === 0" class="text-center py-5">
-        <i class="bi bi-briefcase display-1 text-muted"></i>
-        <h4 class="text-muted mt-3">No hay vacantes registradas</h4>
-        <p class="text-muted">Comienza creando tu primera vacante</p>
-        <button class="btn btn-primary" (click)="abrirModalNuevaVacante()">
-          <i class="bi bi-plus-circle"></i> Crear Primera Vacante
-        </button>
-      </div>
+      <!-- Empty State Template -->
+      <ng-template #emptyState>
+        <div class="detalle-vacante empty-state">
+          <div class="empty-content">
+            <div class="empty-icon">📋</div>
+            <h3>Gestión de Vacantes</h3>
+            <p>Selecciona una vacante para ver sus detalles o crea una nueva</p>
+            <button class="btn btn-primary mt-3" (click)="abrirModalNuevaVacante()">
+              <i class="bi bi-plus-circle"></i> Crear Nueva Vacante
+            </button>
+          </div>
+        </div>
+      </ng-template>
     </div>
 
-    <!-- PANEL DE DETALLES - UNA SOLA VERSIÓN -->
-<div class="detalle-vacante" *ngIf="vacantes.length > 0; else emptyState">
-  <div class="detalle-scroll">
-    <!-- Mostrar vacante seleccionada o la más reciente -->
-    <div *ngIf="(vacanteEditando && isEditMode) ? vacanteEditando : getVacanteMasReciente() as vacanteActual">
+    <!-- PESTAÑA: POSTULADOS & MATCHING - VISTA UNIFICADA -->
+    <div *ngIf="activeTab === 'postulados'" class="home-container-postulados">
 
-      <div class="detalle-header">
-        <div class="header-content">
-          <h2>{{ vacanteActual.titulo }}</h2>
-          <p class="empresa-detalle">{{ vacanteActual.empresa }}</p>
-          <div class="location-info">
-            <span>📍 {{ vacanteActual.ubicacion }}</span>
-            <span class="modalidad-tag" *ngIf="vacanteActual.modalidad?.nombre; else noModalidad">
-              {{ vacanteActual.modalidad.nombre }}
-            </span>
-            <ng-template #noModalidad>
-              <span class="modalidad-tag text-muted">Por definir</span>
-            </ng-template>
+      <!-- Lista de vacantes con postulados (LADO IZQUIERDO) -->
+      <div class="lista-vacantes-postulados">
+        <div class="lista-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h3>Vacantes con Postulados</h3>
+              <p class="total-vacantes">{{ getVacantesConPostulados().length }} {{ getVacantesConPostulados().length === 1 ? 'vacante con postulados' : 'vacantes con postulados' }}</p>
+            </div>
+            <button class="btn btn-outline-primary" (click)="cargarPostuladosYMatching()" [disabled]="postuladosLoading">
+              <i class="bi bi-arrow-clockwise"></i> Actualizar
+            </button>
           </div>
         </div>
-        <div class="match-circle" [class]="getEstadoBadgeClass(vacanteActual.estado)">
-          <span class="match-percentage">{{ getEstadoTexto(vacanteActual.estado) }}</span>
-          <span class="match-label">Estado</span>
-        </div>
-      </div>
 
-      <!-- Información extendida -->
-      <div class="info-grid-extended">
-        <div class="info-card">
-          <span class="info-label">Salario mensual</span>
-          <span class="info-value">${{ vacanteActual.salario | number }}</span>
+        <!-- Loading Postulados -->
+        <div *ngIf="postuladosLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="mt-2 text-muted">Cargando postulados y matching...</p>
         </div>
-        <div class="info-card">
-          <span class="info-label">Horas semanales</span>
-          <span class="info-value">{{ vacanteActual.horasPorSemana || 40 }} hrs</span>
-        </div>
-        <div class="info-card">
-          <span class="info-label">Tipo de contrato</span>
-          <span class="info-value">{{ vacanteActual.tipoContrato || 'Por definir' }}</span>
-        </div>
-        <div class="info-card">
-          <span class="info-label">Solicitudes permitidas</span>
-          <span class="info-value">{{ vacanteActual.solicitudesPermitidas || 50 }}</span>
-        </div>
-        <div class="info-card">
-          <span class="info-label">Área profesional</span>
-          <span class="info-value" *ngIf="vacanteActual.area?.nombre; else noArea">
-            {{ vacanteActual.area.nombre }}
-          </span>
-          <ng-template #noArea>
-            <span class="info-value text-muted">Por definir</span>
-          </ng-template>
-        </div>
-        <div class="info-card">
-          <span class="info-label">Modalidad</span>
-          <span class="info-value" *ngIf="vacanteActual.modalidad?.nombre; else noModalidadInfo">
-            {{ vacanteActual.modalidad.nombre }}
-          </span>
-          <ng-template #noModalidadInfo>
-            <span class="info-value text-muted">Por definir</span>
-          </ng-template>
-        </div>
-      </div>
 
-      <!-- Horario de trabajo -->
-      <div class="seccion" *ngIf="vacanteActual.horaInicio || vacanteActual.horaFin || vacanteActual.diasLaborales || vacanteActual.turno">
-        <h3>Horario de Trabajo</h3>
-        <div class="horario-info">
-          <div *ngIf="vacanteActual.horaInicio && vacanteActual.horaFin" class="horario-item">
-            <span class="horario-label">Horario:</span>
-            <span class="horario-value">{{ vacanteActual.horaInicio }} - {{ vacanteActual.horaFin }}</span>
-          </div>
-          <div *ngIf="vacanteActual.diasLaborales" class="horario-item">
-            <span class="horario-label">Días laborales:</span>
-            <span class="horario-value">{{ vacanteActual.diasLaborales }}</span>
-          </div>
-          <div *ngIf="vacanteActual.turno" class="horario-item">
-            <span class="horario-label">Turno:</span>
-            <span class="horario-value">{{ vacanteActual.turno }}</span>
-          </div>
-          <div *ngIf="vacanteActual.horarioFlexible" class="horario-item">
-            <span class="horario-label badge bg-success">Horario flexible</span>
-          </div>
-          <div *ngIf="!vacanteActual.horaInicio && !vacanteActual.diasLaborales && !vacanteActual.turno" class="horario-item">
-            <span class="text-muted">Información de horario por definir</span>
+        <!-- Lista de vacantes con postulados -->
+        <div *ngIf="!postuladosLoading && getVacantesConPostulados().length > 0">
+          <div
+            class="vacante-card vacante-con-postulados"
+            *ngFor="let vacante of getVacantesConPostulados()"
+            [class.selected]="vacante.vacante_id === vacanteSeleccionadaConPostulados?.vacante_id"
+            (click)="seleccionarVacanteParaPostulados(vacante)">
+            <div class="card-header">
+              <h4>{{ vacante.titulo }}</h4>
+              <div class="postulados-badge">
+                <span class="badge bg-primary">{{ vacante.postulados.length }} postulados</span>
+              </div>
+            </div>
+            <p class="empresa"><strong>{{ vacante.empresa }}</strong></p>
+            <div class="card-info">
+              <span class="info-item">📍 {{ vacante.ubicacion }}</span>
+              <span class="info-item">💼 {{ vacante.area }}</span>
+              <span class="info-item">🏢 {{ vacante.modalidad }}</span>
+            </div>
+
+            <!-- Resumen de postulados -->
+            <div class="postulados-resumen">
+              <div class="postulados-stats">
+                <small class="text-muted">
+                  <strong>Mejor match:</strong>
+                  <span [class]="getMatchBadgeClass(getMaxMatch(vacante.postulados))" class="ms-1">
+                    {{ getMaxMatch(vacante.postulados) }}%
+                  </span>
+                </small>
+                <small class="text-muted">
+                  <strong>Promedio:</strong>
+                  <span class="ms-1">{{ getAverageMatch(vacante.postulados) }}%</span>
+                </small>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <span class="salario">${{ vacante.salario | number }}</span>
+              <span class="horas">{{ vacante.horasSemanales || 40 }} hrs/sem</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Descripción -->
-      <div class="seccion" *ngIf="vacanteActual.descripcion">
-        <h3>Descripción del puesto</h3>
-        <p class="texto-descripcion">{{ vacanteActual.descripcion }}</p>
-      </div>
-
-      <!-- Habilidades -->
-      <div class="seccion" *ngIf="vacanteActual.habilidades && vacanteActual.habilidades.length > 0; else noHabilidades">
-        <h3>Habilidades requeridas</h3>
-        <div class="tags-container">
-          <span *ngFor="let habilidad of vacanteActual.habilidades"
-                class="tag tag-match">
-            {{ habilidad.nombre }}
-          </span>
-        </div>
-      </div>
-      <ng-template #noHabilidades>
-        <div class="seccion">
-          <h3>Habilidades requeridas</h3>
-          <p class="text-muted">No se han especificado habilidades para este puesto</p>
-        </div>
-      </ng-template>
-
-      <!-- Idiomas -->
-      <div class="seccion" *ngIf="vacanteActual.idiomas && vacanteActual.idiomas.length > 0; else noIdiomas">
-        <h3>Idiomas requeridos</h3>
-        <div class="tags-container">
-          <span *ngFor="let idioma of vacanteActual.idiomas"
-                class="tag tag-match">
-            {{ idioma.idioma }}
-          </span>
-        </div>
-      </div>
-      <ng-template #noIdiomas>
-        <div class="seccion">
-          <h3>Idiomas requeridos</h3>
-          <p class="text-muted">No se han especificado idiomas para este puesto</p>
-        </div>
-      </ng-template>
-
-      <!-- Beneficios -->
-      <div class="seccion" *ngIf="vacanteActual.beneficios; else noBeneficios">
-        <h3>Beneficios adicionales</h3>
-        <p class="texto-descripcion">{{ vacanteActual.beneficios }}</p>
-      </div>
-      <ng-template #noBeneficios>
-        <div class="seccion">
-          <h3>Beneficios adicionales</h3>
-          <p class="text-muted">No se han especificado beneficios adicionales</p>
-        </div>
-      </ng-template>
-
-      <!-- Fecha de expiración -->
-      <div class="seccion" *ngIf="vacanteActual.fechaExpiracion">
-        <h3>Vigencia de la vacante</h3>
-        <div class="fecha-expiracion">
-          <span class="fecha-label">Fecha de expiración:</span>
-          <span class="fecha-value">{{ vacanteActual.fechaExpiracion | date:'dd/MM/yyyy' }}</span>
-        </div>
-      </div>
-
-      <!-- Botones de acción -->
-      <div class="botones-footer">
-        <button class="btn btn-primary" (click)="abrirModalEditarVacante(vacanteActual)">
-          <i class="bi bi-pencil"></i> Editar Vacante
-        </button>
-        <button class="btn btn-outline-secondary"
-                (click)="cambiarEstado(vacanteActual, vacanteActual.estado === 'ACTIVA' ? 'INACTIVA' : 'ACTIVA')">
-          <i class="bi" [class]="vacanteActual.estado === 'ACTIVA' ? 'bi-pause' : 'bi-play'"></i>
-          {{ vacanteActual.estado === 'ACTIVA' ? 'Pausar' : 'Activar' }}
-        </button>
-        <button class="btn btn-outline-danger"
-                (click)="eliminarVacante(vacanteActual.id!)">
-          <i class="bi bi-trash"></i> Eliminar
-        </button>
-      </div>
-
-      <!-- Mensaje informativo cuando se muestra la vacante más reciente -->
-      <div class="alert alert-info mt-4" *ngIf="!vacanteEditando || !isEditMode">
-        <i class="bi bi-info-circle me-2"></i>
-        Esta es la vacante más reciente. Haz clic en cualquier vacante de la lista para ver sus detalles.
-      </div>
-    </div>
-  </div>
-</div>
-
-    <!-- Empty State Template -->
-    <ng-template #emptyState>
-      <div class="detalle-vacante empty-state">
-        <div class="empty-content">
-          <div class="empty-icon">📋</div>
-          <h3>Gestión de Vacantes</h3>
-          <p>Selecciona una vacante para ver sus detalles o crea una nueva</p>
-          <button class="btn btn-primary mt-3" (click)="abrirModalNuevaVacante()">
-            <i class="bi bi-plus-circle"></i> Crear Nueva Vacante
+        <!-- Empty State Postulados -->
+        <div *ngIf="!postuladosLoading && getVacantesConPostulados().length === 0" class="text-center py-5">
+          <i class="bi bi-people display-1 text-muted"></i>
+          <h4 class="text-muted mt-3">No hay postulados</h4>
+          <p class="text-muted">Tus vacantes aparecerán aquí cuando reciban postulaciones</p>
+          <button class="btn btn-primary" (click)="cargarPostuladosYMatching()">
+            <i class="bi bi-arrow-clockwise"></i> Revisar Postulados
           </button>
         </div>
       </div>
-    </ng-template>
+
+      <!-- Panel de detalles de postulados (LADO DERECHO) -->
+      <div class="detalle-postulados" *ngIf="vacanteSeleccionadaConPostulados; else noVacanteSeleccionada">
+        <div class="detalle-scroll">
+          <div class="detalle-header">
+            <div class="header-content">
+              <h2>{{ vacanteSeleccionadaConPostulados.titulo }}</h2>
+              <p class="empresa-detalle">{{ vacanteSeleccionadaConPostulados.empresa }}</p>
+              <div class="location-info">
+                <span>📍 {{ vacanteSeleccionadaConPostulados.ubicacion }}</span>
+                <span class="modalidad-tag">{{ vacanteSeleccionadaConPostulados.modalidad }}</span>
+              </div>
+            </div>
+            <div class="postulados-count">
+              <span class="count-number">{{ vacanteSeleccionadaConPostulados.postulados.length }}</span>
+              <span class="count-label">Postulados</span>
+            </div>
+          </div>
+
+          <!-- Lista de postulados -->
+          <div class="seccion">
+            <h3>Postulados</h3>
+            <div *ngIf="vacanteSeleccionadaConPostulados.postulados.length > 0; else noPostulados">
+              <div class="postulado-card" *ngFor="let postulado of vacanteSeleccionadaConPostulados.postulados">
+                <div class="postulado-header">
+                  <div class="postulado-info">
+                    <h4>{{ postulado.username }}</h4>
+                    <p class="postulado-email">{{ postulado.email }}</p>
+                  </div>
+                  <div class="postulado-match">
+                    <span [class]="getMatchBadgeClass(postulado.porcentaje_match)" class="match-badge">
+                      {{ postulado.porcentaje_match }}% - {{ getMatchText(postulado.porcentaje_match) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="postulado-details">
+                  <div class="detail-item">
+                    <span class="detail-label">Área:</span>
+                    <span class="detail-value">{{ postulado.area || 'No especificado' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Salario esperado:</span>
+                    <span class="detail-value">${{ postulado.salario | number }}</span>
+                  </div>
+                </div>
+
+                <!-- Habilidades del postulado -->
+                <div class="postulado-skills" *ngIf="postulado.habilidades && postulado.habilidades.length > 0">
+                  <span class="skills-label">Habilidades:</span>
+                  <div class="skills-tags">
+                    <span *ngFor="let habilidad of postulado.habilidades.slice(0, 5)"
+                          class="badge bg-info me-1 mb-1">
+                      {{ habilidad }}
+                    </span>
+                    <span *ngIf="postulado.habilidades.length > 5" class="text-muted">
+                      +{{ postulado.habilidades.length - 5 }} más
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Idiomas del postulado -->
+                <div class="postulado-skills" *ngIf="postulado.idiomas && postulado.idiomas.length > 0">
+                  <span class="skills-label">Idiomas:</span>
+                  <div class="skills-tags">
+                    <span *ngFor="let idioma of postulado.idiomas"
+                          class="badge bg-warning me-1 mb-1">
+                      {{ idioma }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="postulado-actions mt-3 pt-3 border-top">
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm">
+                      <i class="bi bi-eye me-1"></i> Ver Perfil
+                    </button>
+                    <button class="btn btn-success btn-sm">
+                      <i class="bi bi-check-circle me-1"></i> Contactar
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm">
+                      <i class="bi bi-download me-1"></i> CV
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noPostulados>
+              <div class="text-center py-4">
+                <i class="bi bi-people display-4 text-muted"></i>
+                <h5 class="text-muted mt-3">No hay postulados para esta vacante</h5>
+                <p class="text-muted">Los postulados aparecerán aquí cuando se postulen a esta vacante</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado cuando no hay vacante seleccionada -->
+      <ng-template #noVacanteSeleccionada>
+        <div class="detalle-postulados empty-state">
+          <div class="empty-content">
+            <div class="empty-icon">👥</div>
+            <h3>Postulados & Matching</h3>
+            <p>Selecciona una vacante de la lista para ver los postulados y su porcentaje de matching</p>
+          </div>
+        </div>
+      </ng-template>
+    </div>
   </div>
 </div>
 
