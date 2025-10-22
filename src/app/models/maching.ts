@@ -60,6 +60,7 @@ export interface VacanteMatch {
   area_match: AreaMatch;
   salario_match: SalarioMatch;
   porcentaje_match: number;
+  
   // 🔥 NUEVO: Campo para postulados (solo en tipo 2)
   postulados?: PostuladoMatch[];
 }
