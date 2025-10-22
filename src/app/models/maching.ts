@@ -48,4 +48,5 @@ export interface VacanteMatch {
   area_match: AreaMatch;
   salario_match: SalarioMatch;
   porcentaje_match: number;
+  postulante?: boolean; 
 }
