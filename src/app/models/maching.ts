@@ -47,7 +47,7 @@ export interface SalarioMatch {
 export interface VacanteMatch {
   id: number;
   titulo: string;
-  empresa: string;
+  empresa: number;
   descripcion: string;
   beneficios: string;
   horas_por_semana: number;
@@ -63,7 +63,7 @@ export interface VacanteMatch {
   area_match: AreaMatch;
   salario_match: SalarioMatch;
   porcentaje_match: number;
-  postulante?: boolean; 
+  postulante?: boolean;
   // 🔥 NUEVO: Campo para postulados (solo en tipo 2)
   postulados?: PostuladoMatch[];
 }

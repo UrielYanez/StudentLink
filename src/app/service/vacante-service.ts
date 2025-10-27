@@ -16,7 +16,7 @@ export class VacanteService {
 
   // Vacantes
   obtenerVacantes(): Observable<ApiResponse<Vacante[]>> {
-    return this.http.get<ApiResponse<Vacante[]>>(`${this.baseUrl}/vacantes`);
+    return this.http.get<ApiResponse<Vacante[]>>(`${this.baseUrl}/vacantes/completas`);
   }
 
   obtenerVacantePorId(id: number): Observable<ApiResponse<Vacante>> {
@@ -101,44 +101,6 @@ obtenerVacanteParaEdicion(id: number): Observable<ApiResponse<Vacante>> {
     return this.http.post<ApiResponse<Modalidad>>(`${this.baseUrl}/catalogos/modalidades`, modalidad);
   }
 
-
-  // 🔥 NUEVO: Servicio de Matching para obtener postulados
-  // obtenerPostuladosYMatching(clienteId: number): Observable<VacanteMatch[]> {
-  //   console.log('🎯 VacanteService - Obteniendo postulados y matching para cliente:', clienteId);
-
-  //   const request: MatchingRequest = {
-  //     tipo: 2, // Tipo 2 para obtener vacantes con postulados
-  //     clienteId: clienteId
-  //   };
-
-  //   console.log('📤 VacanteService - Enviando request de matching:', request);
-
-  //   return this.http.post<VacanteMatch[]>(this.matchingApiUrl, request).pipe(
-  //     tap(response => {
-  //       console.log('✅ VacanteService - Respuesta de matching recibida:', {
-  //         totalVacantes: response.length,
-  //         primeraVacante: response[0] ? {
-  //           id: response[0].id,
-  //           titulo: response[0].titulo,
-  //           postuladosCount: response[0].postulados ? response[0].postulados.length : 0
-  //         } : 'No hay datos'
-  //       });
-  //     })
-  //   );
-  // }
-
-  // // 🔥 NUEVO: Servicio de Matching con filtros
-  // obtenerMatchingConFiltros(request: MatchingRequest): Observable<VacanteMatch[]> {
-  //   console.log('🎯 VacanteService - Obteniendo matching con filtros:', request);
-
-  //   return this.http.post<VacanteMatch[]>(this.matchingApiUrl, request).pipe(
-  //     tap(response => {
-  //       console.log('✅ VacanteService - Matching con filtros recibido:', response.length);
-  //     })
-  //   );
-  // }
-
-  // 🔥 NUEVO: Servicio de Matching para obtener postulados
 obtenerPostuladosYMatching(clienteId: number): Observable<VacanteMatch[]> {
   console.log('🎯 VacanteService - Obteniendo postulados y matching para cliente:', clienteId);
 

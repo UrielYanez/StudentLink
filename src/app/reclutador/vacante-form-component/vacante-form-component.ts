@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
 import { VacanteRequest, Area, Habilidad, Idioma, Modalidad, Vacante } from '../../models/vacante-model';
 import { VacanteService } from '../../service/vacante-service';
+import { EmpresaContextService } from '../../auth/Service/empresa-context-service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vacante-form-modal',
@@ -19,13 +21,12 @@ export class VacanteFormComponent implements OnInit, OnChanges {
     titulo: '',
     descripcion: '',
     salario: 0,
-    ubicacion: '',
     tipoContrato: '',
     solicitudesPermitidas: 50,
     estado: 'ACTIVA',
     fechaExpiracion: '',
     beneficios: '',
-    empresa: '',
+    empresaId: 0, // ✅ Inicializar en 0, se asignará dinámicamente
     horaInicio: '',
     horaFin: '',
     diasLaborales: '',
@@ -49,12 +50,20 @@ export class VacanteFormComponent implements OnInit, OnChanges {
   success = '';
   catalogosCargados = false;
 
-  constructor(private vacanteService: VacanteService) {
+  // ✅ Variables para empresa dinámica
+  empresaId: number | null = null;
+  nombreEmpresa: string | null = null;
+
+  constructor(
+    private vacanteService: VacanteService,
+    private empresaContextService: EmpresaContextService // ✅ Inyectar servicio
+  ) {
     console.log('✅ VacanteFormModalComponent - Constructor inicializado');
   }
 
   ngOnInit(): void {
     console.log('🔄 VacanteFormModalComponent - ngOnInit iniciado');
+    this.cargarEmpresaDinamica();
     this.cargarCatalogos();
   }
 
@@ -76,6 +85,48 @@ export class VacanteFormComponent implements OnInit, OnChanges {
     }
   }
 
+  // ✅ Método para cargar empresa dinámica
+  cargarEmpresaDinamica(): void {
+    const empresaActual = this.empresaContextService.getEmpresaActual();
+    if (empresaActual) {
+      this.empresaId = empresaActual.id ?? null;
+      this.nombreEmpresa = empresaActual.nombre ?? null;
+
+      // ✅ Asignar empresaId al request si está disponible
+      if (this.empresaId) {
+        this.vacanteRequest.empresaId = this.empresaId;
+      }
+
+      console.log('🏢 VacanteFormModalComponent - Empresa cargada:', {
+        id: this.empresaId,
+        nombre: this.nombreEmpresa
+      });
+    } else {
+      console.log('⚠️ VacanteFormModalComponent - No hay empresa seleccionada');
+      this.mostrarAdvertencia('Sin empresa seleccionada', 'No hay una empresa seleccionada. La vacante se creará sin empresa asignada.');
+    }
+
+    // ✅ Suscribirse a cambios en la empresa
+    this.empresaContextService.empresaActual$.subscribe(empresa => {
+      if (empresa) {
+        this.empresaId = empresa.id ?? null;
+        this.nombreEmpresa = empresa.nombre ?? null;
+
+        // ✅ Actualizar empresaId en el request si hay cambios
+        if (this.empresaId) {
+          this.vacanteRequest.empresaId = this.empresaId;
+        }
+
+        console.log('🔄 VacanteFormModalComponent - Empresa actualizada:', {
+          id: this.empresaId,
+          nombre: this.nombreEmpresa
+        });
+
+        this.mostrarInfo('Empresa actualizada', `Ahora trabajando con: ${this.nombreEmpresa}`);
+      }
+    });
+  }
+
   cargarCatalogos(): void {
     console.log('📥 VacanteFormModalComponent - Cargando catálogos...');
 
@@ -90,6 +141,7 @@ export class VacanteFormComponent implements OnInit, OnChanges {
       },
       error: (error) => {
         console.error('❌ VacanteFormModalComponent - Error cargando áreas:', error);
+        this.mostrarError('Error al cargar áreas', 'No se pudieron cargar las áreas disponibles.');
       }
     });
 
@@ -104,6 +156,7 @@ export class VacanteFormComponent implements OnInit, OnChanges {
       },
       error: (error) => {
         console.error('❌ VacanteFormModalComponent - Error cargando habilidades:', error);
+        this.mostrarError('Error al cargar habilidades', 'No se pudieron cargar las habilidades disponibles.');
       }
     });
 
@@ -118,6 +171,7 @@ export class VacanteFormComponent implements OnInit, OnChanges {
       },
       error: (error) => {
         console.error('❌ VacanteFormModalComponent - Error cargando idiomas:', error);
+        this.mostrarError('Error al cargar idiomas', 'No se pudieron cargar los idiomas disponibles.');
       }
     });
 
@@ -132,6 +186,7 @@ export class VacanteFormComponent implements OnInit, OnChanges {
       },
       error: (error) => {
         console.error('❌ VacanteFormModalComponent - Error cargando modalidades:', error);
+        this.mostrarError('Error al cargar modalidades', 'No se pudieron cargar las modalidades disponibles.');
       }
     });
   }
@@ -154,6 +209,7 @@ export class VacanteFormComponent implements OnInit, OnChanges {
     console.log('📋 VacanteFormModalComponent - Cargando datos de vacante para edición');
     if (!this.vacante) {
       console.error('❌ VacanteFormModalComponent - No hay datos de vacante para editar');
+      this.mostrarError('Error', 'No se encontraron datos de la vacante para editar.');
       return;
     }
 
@@ -170,13 +226,13 @@ export class VacanteFormComponent implements OnInit, OnChanges {
       titulo: this.vacante.titulo || '',
       descripcion: this.vacante.descripcion || '',
       salario: this.vacante.salario || 0,
-      ubicacion: this.vacante.ubicacion || '',
       tipoContrato: this.vacante.tipoContrato || '',
       solicitudesPermitidas: this.vacante.solicitudesPermitidas || 50,
       estado: this.vacante.estado || 'ACTIVA',
       fechaExpiracion: this.formatFechaExpiracion(this.vacante.fechaExpiracion) || '',
       beneficios: this.vacante.beneficios || '',
-      empresa: this.vacante.empresa || '',
+      // ✅ Usar empresaId de la vacante existente o la empresa actual
+      empresaId: this.vacante.empresaId || this.empresaId || 0,
       horaInicio: this.vacante.horaInicio || '',
       horaFin: this.vacante.horaFin || '',
       diasLaborales: this.vacante.diasLaborales || '',
@@ -190,6 +246,7 @@ export class VacanteFormComponent implements OnInit, OnChanges {
     };
 
     console.log('✅ VacanteFormModalComponent - Datos de edición cargados:', {
+      empresaId: this.vacanteRequest.empresaId,
       areaId: this.vacanteRequest.areaId,
       modalidadId: this.vacanteRequest.modalidadId,
       habilidadesIds: this.vacanteRequest.habilidadesIds,
@@ -235,28 +292,33 @@ export class VacanteFormComponent implements OnInit, OnChanges {
         } else {
           console.error('❌ VacanteFormModalComponent - Error en respuesta de habilidades filtradas');
           this.habilidadesFiltradas = [];
+          this.mostrarError('Error', 'No se pudieron cargar las habilidades para el área seleccionada.');
         }
       },
       error: (error) => {
         console.error('❌ VacanteFormModalComponent - Error cargando habilidades filtradas:', error);
         this.habilidadesFiltradas = [];
+        this.mostrarError('Error de conexión', 'No se pudieron cargar las habilidades. Verifica tu conexión.');
       }
     });
   }
 
   inicializarNuevaVacante(): void {
     console.log('🆕 VacanteFormModalComponent - Inicializando nueva vacante');
+
+    // ✅ Usar empresaId dinámico o dejar en 0 si no hay empresa seleccionada
+    const empresaId = this.empresaId || 0;
+
     this.vacanteRequest = {
       titulo: '',
       descripcion: '',
       salario: 0,
-      ubicacion: '',
       tipoContrato: '',
       solicitudesPermitidas: 50,
       estado: 'ACTIVA',
       fechaExpiracion: this.obtenerFechaExpiracionPorDefecto(),
       beneficios: '',
-      empresa: '',
+      empresaId: empresaId, // ✅ Usar empresaId dinámico
       horaInicio: '',
       horaFin: '',
       diasLaborales: '',
@@ -271,6 +333,8 @@ export class VacanteFormComponent implements OnInit, OnChanges {
     this.habilidadesFiltradas = [];
     this.error = '';
     this.success = '';
+
+    console.log('🏢 VacanteFormModalComponent - Nueva vacante inicializada con empresaId:', empresaId);
   }
 
   obtenerFechaExpiracionPorDefecto(): string {
@@ -319,11 +383,31 @@ export class VacanteFormComponent implements OnInit, OnChanges {
       datos: this.vacanteRequest
     });
 
+    // ✅ Validar que haya una empresa seleccionada
+    if (!this.vacanteRequest.empresaId || this.vacanteRequest.empresaId === 0) {
+      this.mostrarError('Empresa requerida', 'No hay una empresa seleccionada. Por favor, selecciona una empresa antes de crear la vacante.');
+      return;
+    }
+
     // Validar datos requeridos
     if (!this.validarFormulario()) {
       return;
     }
 
+    // Mostrar confirmación antes de guardar
+    this.mostrarConfirmacion(
+      this.isEdit ? 'Actualizar vacante' : 'Crear vacante',
+      this.isEdit
+        ? `¿Estás seguro de que deseas actualizar la vacante "${this.vacanteRequest.titulo}"?`
+        : `¿Estás seguro de que deseas crear la vacante "${this.vacanteRequest.titulo}"?`
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.procesarEnvio();
+      }
+    });
+  }
+
+  private procesarEnvio(): void {
     this.loading = true;
     this.error = '';
     this.success = '';
@@ -336,22 +420,25 @@ export class VacanteFormComponent implements OnInit, OnChanges {
       next: (response) => {
         console.log('✅ VacanteFormModalComponent - Respuesta del servidor:', response);
         if (response.success) {
-          this.success = this.isEdit
-            ? 'Vacante actualizada exitosamente'
-            : 'Vacante creada exitosamente';
+          this.mostrarExito(
+            this.isEdit ? 'Vacante actualizada' : 'Vacante creada',
+            this.isEdit
+              ? 'La vacante ha sido actualizada exitosamente.'
+              : 'La vacante ha sido creada exitosamente.'
+          );
 
           console.log('🎉 VacanteFormModalComponent - Operación exitosa, emitiendo evento guardado');
           setTimeout(() => {
             this.guardado.emit();
           }, 1500);
         } else {
-          this.error = response.message || 'Error al procesar la solicitud';
-          console.error('❌ VacanteFormModalComponent - Error en respuesta:', this.error);
+          this.mostrarError('Error al procesar', response.message || 'Error al procesar la solicitud');
+          console.error('❌ VacanteFormModalComponent - Error en respuesta:', response.message);
         }
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'Error de conexión: ' + error.message;
+        this.mostrarError('Error de conexión', 'No se pudo completar la operación. Verifica tu conexión e intenta nuevamente.');
         this.loading = false;
         console.error('❌ VacanteFormModalComponent - Error HTTP:', error);
       }
@@ -360,43 +447,48 @@ export class VacanteFormComponent implements OnInit, OnChanges {
 
   validarFormulario(): boolean {
     if (!this.vacanteRequest.titulo.trim()) {
-      this.error = 'El título del puesto es requerido';
-      return false;
-    }
-    if (!this.vacanteRequest.empresa.trim()) {
-      this.error = 'La empresa es requerida';
+      this.mostrarError('Campo requerido', 'El título del puesto es requerido');
       return false;
     }
     if (!this.vacanteRequest.descripcion.trim()) {
-      this.error = 'La descripción es requerida';
-      return false;
-    }
-    if (!this.vacanteRequest.ubicacion.trim()) {
-      this.error = 'La ubicación es requerida';
+      this.mostrarError('Campo requerido', 'La descripción es requerida');
       return false;
     }
     if (!this.vacanteRequest.areaId) {
-      this.error = 'El área profesional es requerida';
+      this.mostrarError('Campo requerido', 'El área profesional es requerida');
       return false;
     }
     if (!this.vacanteRequest.modalidadId) {
-      this.error = 'La modalidad de trabajo es requerida';
+      this.mostrarError('Campo requerido', 'La modalidad de trabajo es requerida');
       return false;
     }
     if (!this.vacanteRequest.tipoContrato.trim()) {
-      this.error = 'El tipo de contrato es requerido';
+      this.mostrarError('Campo requerido', 'El tipo de contrato es requerido');
       return false;
     }
     if (!this.vacanteRequest.fechaExpiracion) {
-      this.error = 'La fecha de expiración es requerida';
+      this.mostrarError('Campo requerido', 'La fecha de expiración es requerida');
       return false;
     }
     return true;
   }
 
   onClose(): void {
-    console.log('❌ VacanteFormModalComponent - Cerrando modal');
-    this.close.emit();
+    // Verificar si hay cambios sin guardar
+    if (this.hayCambiosSinGuardar()) {
+      this.mostrarConfirmacion(
+        'Cambios sin guardar',
+        'Tienes cambios sin guardar. ¿Estás seguro de que deseas salir?'
+      ).then((result) => {
+        if (result.isConfirmed) {
+          console.log('❌ VacanteFormModalComponent - Cerrando modal');
+          this.close.emit();
+        }
+      });
+    } else {
+      console.log('❌ VacanteFormModalComponent - Cerrando modal');
+      this.close.emit();
+    }
   }
 
   onBackdropClick(event: MouseEvent): void {
@@ -404,6 +496,23 @@ export class VacanteFormComponent implements OnInit, OnChanges {
     if (target.classList.contains('modal-backdrop')) {
       console.log('🎯 VacanteFormModalComponent - Click en backdrop, cerrando modal');
       this.onClose();
+    }
+  }
+
+  // Helper para verificar si hay cambios sin guardar
+  private hayCambiosSinGuardar(): boolean {
+    if (this.isEdit && this.vacante) {
+      // Comparar con los datos originales de la vacante
+      return this.vacanteRequest.titulo !== this.vacante.titulo ||
+             this.vacanteRequest.descripcion !== this.vacante.descripcion ||
+             this.vacanteRequest.salario !== this.vacante.salario ||
+             this.vacanteRequest.areaId !== (this.vacante.area?.id || 0) ||
+             this.vacanteRequest.modalidadId !== (this.vacante.modalidad?.id || 0);
+    } else {
+      // Para nueva vacante, verificar si hay algún dato ingresado
+      return this.vacanteRequest.titulo.trim() !== '' ||
+             this.vacanteRequest.descripcion.trim() !== '' ||
+             this.vacanteRequest.salario > 0;
     }
   }
 
@@ -427,5 +536,67 @@ export class VacanteFormComponent implements OnInit, OnChanges {
   getModalidadNombre(): string {
     const modalidad = this.modalidades.find(m => m.id === this.vacanteRequest.modalidadId);
     return modalidad ? modalidad.nombre : 'No seleccionada';
+  }
+
+  // ✅ Helper para obtener nombre de la empresa
+  getNombreEmpresa(): string {
+    return this.nombreEmpresa || `Empresa ${this.empresaId || 'No seleccionada'}`;
+  }
+
+  // ✅ Métodos de SweetAlert2
+  private mostrarExito(titulo: string, mensaje: string): void {
+    Swal.fire({
+      title: titulo,
+      text: mensaje,
+      icon: 'success',
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'Aceptar',
+      timer: 3000
+    });
+  }
+
+  private mostrarError(titulo: string, mensaje: string): void {
+    Swal.fire({
+      title: titulo,
+      text: mensaje,
+      icon: 'error',
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Aceptar'
+    });
+  }
+
+  private mostrarInfo(titulo: string, mensaje: string): void {
+    Swal.fire({
+      title: titulo,
+      text: mensaje,
+      icon: 'info',
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'Aceptar',
+      timer: 3000
+    });
+  }
+
+  private mostrarAdvertencia(titulo: string, mensaje: string): void {
+    Swal.fire({
+      title: titulo,
+      text: mensaje,
+      icon: 'warning',
+      confirmButtonColor: '#ffc107',
+      confirmButtonText: 'Entendido',
+      timer: 4000
+    });
+  }
+
+  private mostrarConfirmacion(titulo: string, mensaje: string): Promise<any> {
+    return Swal.fire({
+      title: titulo,
+      text: mensaje,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, continuar',
+      cancelButtonText: 'Cancelar'
+    });
   }
 }

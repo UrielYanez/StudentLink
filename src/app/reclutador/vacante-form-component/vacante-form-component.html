@@ -34,6 +34,17 @@
         {{ success }}
       </div>
 
+      <!-- Información de empresa -->
+      <!-- <div *ngIf="empresaId" class="alert alert-info mb-4">
+        <i class="bi bi-building me-2"></i>
+        <strong>Empresa:</strong> {{ getNombreEmpresa() }}
+      </div> -->
+
+      <div *ngIf="!empresaId" class="alert alert-warning mb-4">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Advertencia:</strong> No hay empresa seleccionada. La vacante se creará sin empresa asignada.
+      </div>
+
       <form *ngIf="!loading" (ngSubmit)="onSubmit()" #vacanteForm="ngForm" class="vacante-form">
         <div class="form-sections">
           <!-- Información Básica -->
@@ -43,20 +54,12 @@
               Información Básica
             </h4>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-12">
                 <div class="form-group">
                   <label for="titulo" class="form-label">Título del puesto *</label>
                   <input type="text" class="form-control" id="titulo"
                          [(ngModel)]="vacanteRequest.titulo" name="titulo"
                          required placeholder="Ej: Desarrollador Frontend">
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="empresa" class="form-label">Empresa *</label>
-                  <input type="text" class="form-control" id="empresa"
-                         [(ngModel)]="vacanteRequest.empresa" name="empresa"
-                         required placeholder="Nombre de la empresa">
                 </div>
               </div>
             </div>
@@ -71,21 +74,13 @@
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="ubicacion" class="form-label">Ubicación *</label>
-                  <input type="text" class="form-control" id="ubicacion"
-                         [(ngModel)]="vacanteRequest.ubicacion" name="ubicacion"
-                         required placeholder="Ciudad, Estado">
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
                   <label for="salario" class="form-label">Salario mensual *</label>
                   <input type="number" class="form-control" id="salario"
                          [(ngModel)]="vacanteRequest.salario" name="salario"
                          required min="0" step="0.01" placeholder="0.00">
                 </div>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-6">
                 <div class="form-group">
                   <label for="solicitudesPermitidas" class="form-label">Solicitudes permitidas *</label>
                   <input type="number" class="form-control" id="solicitudesPermitidas"
