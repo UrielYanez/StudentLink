@@ -3,6 +3,8 @@ import { MatchingRequest, VacanteMatch } from '../../models/maching';
 import { Maching } from '../../service/maching';
 import { UsuarioContextService } from '../../auth/Service/usuario-context-service';
 import Swal from 'sweetalert2';
+import { VacanteService } from '../../service/vacante-service';
+import { Area,Habilidad,Idioma,Modalidad } from '../../models/vacante-model';
 
 @Component({
   selector: 'app-home',
@@ -24,19 +26,25 @@ export class homeMaching implements OnInit {
   // Variables para el modal de datos de usuario global
   nombreUsuarioGlobal: string | null = null;
   idUsuarioGlobal: number | null = null;
-
+ emailll: string | null = null;
   // Opciones para los selects
-  modalidades: string[] = ['Presencial', 'Remoto', 'Híbrido'];
-  areas: string[] = ['Sistemas', 'Recursos Humanos', 'Ventas', 'Marketing', 'Finanzas', 'Operaciones'];
-  turnos: string[] = ['Matutino', 'Vespertino', 'Nocturno', 'Mixto'];
+  turnos: string[] = ['Matutino', 'Vespertino', 'Nocturno', 'Mixto','Flexible'];
+
+    areas: Area[] = [];
+    habilidades: Habilidad[] = [];
+    habilidadesFiltradas: Habilidad[] = [];
+    idiomas: Idioma[] = [];
+    modalidades: Modalidad[] = [];
 
   // Estado de filtros
   mostrarFiltros: boolean = false;
   aplicandoFiltros: boolean = false;
 
-  constructor(private matchingService: Maching, private usuarioContextService: UsuarioContextService,) { }
+  constructor(private matchingService: Maching, private usuarioContextService: UsuarioContextService,private vacanteService: VacanteService) { }
 
   ngOnInit() {
+    this.cargarCatalogos();
+  
     // Suscribirse a los cambios del usuario
     this.usuarioContextService.usuarioCambio$.subscribe((userData) => {
       if (userData) {
@@ -52,6 +60,8 @@ export class homeMaching implements OnInit {
     const userData = this.usuarioContextService.getUserData();
     if (userData) {
       this.nombreUsuarioGlobal = userData.name;
+      this.emailll = userData.email;
+      console.log(this.emailll)
       this.idUsuarioGlobal = userData.id ?? null;
       this.cargarVacantesIniciales(); // 👈 se ejecuta si ya había datos guardados
     }
@@ -226,4 +236,64 @@ export class homeMaching implements OnInit {
     });
   }
 
+
+  cargarCatalogos(): void {
+    console.log('📥 VacanteFormModalComponent - Cargando catálogos...');
+
+    // Cargar áreas
+    this.vacanteService.obtenerAreas().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.areas = response.data;
+          console.log('✅ VacanteFormModalComponent - Áreas cargadas:', this.areas.length);
+         
+        }
+      },
+      error: (error) => {
+        console.error('❌ VacanteFormModalComponent - Error cargando áreas:', error);
+      }
+    });
+
+    // Cargar habilidades
+    this.vacanteService.obtenerHabilidades().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.habilidades = response.data;
+          console.log('✅ VacanteFormModalComponent - Habilidades cargadas:', this.habilidades.length);
+         
+        }
+      },
+      error: (error) => {
+        console.error('❌ VacanteFormModalComponent - Error cargando habilidades:', error);
+      }
+    });
+
+    // Cargar idiomas
+    this.vacanteService.obtenerIdiomas().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.idiomas = response.data;
+          console.log('✅ VacanteFormModalComponent - Idiomas cargados:', this.idiomas.length);
+         
+        }
+      },
+      error: (error) => {
+        console.error('❌ VacanteFormModalComponent - Error cargando idiomas:', error);
+      }
+    });
+
+    // Cargar modalidades
+    this.vacanteService.obtenerModalidades().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.modalidades = response.data;
+          console.log('✅ VacanteFormModalComponent - Modalidades cargadas:', this.modalidades.length);
+         
+        }
+      },
+      error: (error) => {
+        console.error('❌ VacanteFormModalComponent - Error cargando modalidades:', error);
+      }
+    });
+  }
 }

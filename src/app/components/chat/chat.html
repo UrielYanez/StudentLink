@@ -1,0 +1,201 @@
+<div class="chat-container">
+  
+  <!-- Header -->
+  <div class="chat-header">
+    <h2>💬 Chat Privado</h2>
+    <p><strong>Usuario:</strong> {{ nombreUsuarioGlobal }}</p>
+    <p><strong>Estado:</strong> 
+      <span [class]="chatState.connected ? 'status-connected' : 'status-disconnected'">
+        {{ chatState.connected ? '✅ Conectado' : '❌ Desconectado' }}
+      </span>
+    </p>
+  </div>
+
+  <!-- Panel principal -->
+  <div class="chat-main" *ngIf="chatState.connected">
+    
+    <!-- Panel lateral - Lista de conversaciones -->
+    <div class="conversations-panel">
+      
+      <!-- Crear nueva conversación -->
+      <div class="new-conversation">
+        <h3>Nueva Conversación</h3>
+        <div class="input-group">
+          <input 
+            [(ngModel)]="newContactName"
+            placeholder="Nombre del usuario..."
+            (keyup.enter)="createNewConversation()"
+            class="contact-input"
+          />
+          <button 
+            (click)="createNewConversation()"
+            class="add-btn"
+            [disabled]="!newContactName?.trim()">
+            ➕
+          </button>
+        </div>
+      </div>
+
+      <!-- Usuarios sugeridos -->
+      <div class="suggested-contacts" *ngIf="getSuggestedContacts().length > 0">
+        <h4>Usuarios disponibles:</h4>
+        <div class="suggested-list">
+          <button 
+            *ngFor="let user of getSuggestedContacts()"
+            (click)="createNewConversation(user)"
+            class="suggested-user">
+            👤 {{ user }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista de conversaciones -->
+      <div class="conversations-list">
+        <h3>Conversaciones ({{ chatState.conversations?.length || 0 }})</h3>
+        
+        <div *ngIf="!chatState.conversations || chatState.conversations.length === 0" class="no-conversations">
+          <p>No hay conversaciones</p>
+          <small>¡Inicia una nueva conversación!</small>
+        </div>
+
+        <div 
+          *ngFor="let conv of chatState.conversations || []"
+          class="conversation-item"
+          [class.active]="chatState.activeConversation === conv?.contact"
+          (click)="selectConversation(conv?.contact || '')">
+          
+          <div class="conversation-avatar">
+            {{ (conv?.contact?.charAt(0) || '?').toUpperCase() }}
+          </div>
+          
+          <div class="conversation-info">
+            <strong>{{ conv?.contact || 'Usuario desconocido' }}</strong>
+            <p class="last-message">{{ conv?.lastMessage || 'Sin mensajes' }}</p>
+            <small class="message-time">{{ conv?.lastMessageTime | date:'shortTime' }}</small>
+          </div>
+          
+          <div class="conversation-badge">
+            <span *ngIf="conv?.unreadCount && conv.unreadCount > 0" class="unread-count">
+              {{ conv.unreadCount }}
+            </span>
+            <button 
+              (click)="deleteConversation(conv?.contact || '', $event)"
+              class="delete-btn">
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de mensajes -->
+    <div class="messages-panel" *ngIf="getActiveConversation() && chatState.activeConversation">
+      
+      <!-- Header de la conversación -->
+      <div class="conversation-header">
+        <div class="contact-info">
+          <div class="contact-avatar large">
+            {{ (chatState.activeConversation?.charAt(0) || '?').toUpperCase() }}
+          </div>
+          <div>
+            <h3>{{ chatState.activeConversation }}</h3>
+            <span class="contact-status">En línea</span>
+          </div>
+        </div>
+        <div class="conversation-stats">
+          {{ (getActiveConversation()?.messages?.length || 0) }} mensajes
+        </div>
+      </div>
+
+      <!-- Área de mensajes -->
+      <div class="messages-container">
+        <div *ngIf="!getActiveConversation()?.messages || getActiveConversation()?.messages?.length === 0" class="empty-conversation">
+          <div class="empty-state">
+            <h4>💬 Nueva conversación privada</h4>
+            <p>Envía el primer mensaje a {{ chatState.activeConversation }}</p>
+          </div>
+        </div>
+
+        <div *ngFor="let msg of getActiveConversation()?.messages || []" 
+             class="message"
+             [class.sent]="msg?.type === 'sent'"
+             [class.received]="msg?.type === 'received'">
+          
+          <div class="message-content">
+            <div class="message-text">{{ msg?.content || 'Mensaje vacío' }}</div>
+            <div class="message-time">{{ msg?.timestamp | date:'shortTime' }}</div>
+          </div>
+          
+          <div class="message-sender">
+            {{ msg?.sender || 'Remitente desconocido' }}
+            <span *ngIf="msg?.type === 'sent'" class="sent-indicator">✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input de mensaje -->
+      <div class="message-input-section">
+        
+        <!-- Mensajes rápidos -->
+        <div class="quick-messages">
+          <button (click)="sendQuickMessage('Hola 👋')" class="quick-btn">Hola 👋</button>
+          <button (click)="sendQuickMessage('¿Cómo estás?')" class="quick-btn">¿Cómo estás?</button>
+          <button (click)="sendQuickMessage('¡Hola!')" class="quick-btn">¡Hola!</button>
+        </div>
+
+        <div class="input-group">
+          <input 
+            [(ngModel)]="messageInput"
+            placeholder="Escribe tu mensaje privado..."
+            (keyup.enter)="sendMessage()"
+            class="message-input"
+          />
+          <button 
+            (click)="sendMessage()"
+            class="send-btn"
+            [disabled]="!messageInput?.trim()">
+            📤 Enviar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de bienvenida -->
+    <div class="welcome-panel" *ngIf="!getActiveConversation()">
+      <div class="welcome-content">
+        <div class="welcome-icon">💬</div>
+        <h2>Conversaciones Privadas</h2>
+        <p>Selecciona una conversación o inicia una nueva para chatear de forma privada</p>
+        
+        <div class="welcome-features">
+          <div class="feature">
+            <span>🔒</span>
+            <div>
+              <strong>Privacidad total</strong>
+              <small>Solo tú y el destinatario ven los mensajes</small>
+            </div>
+          </div>
+          <div class="feature">
+            <span>👥</span>
+            <div>
+              <strong>Conversaciones separadas</strong>
+              <small>Cada chat es independiente</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Estado desconectado -->
+  <div *ngIf="!chatState.connected" class="disconnected-state">
+    <div class="disconnected-content">
+      <h2>🔌 Desconectado</h2>
+      <button (click)="connectToChat()" class="connect-btn">
+        Conectar al Chat
+      </button>
+    </div>
+  </div>
+
+</div>

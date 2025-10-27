@@ -31,8 +31,10 @@
         <div class="filtro-item">
           <label for="modalidad">Modalidad</label>
           <select id="modalidad" [(ngModel)]="filtros.modalidad" class="select-filtro">
-            <option value="">Todas</option>
-            <option *ngFor="let mod of modalidades" [value]="mod">{{ mod }}</option>
+              <option value="" selected disabled>Selecciona una</option>
+             <option *ngFor="let modalidad of modalidades" [value]="modalidad.nombre">
+                      {{ modalidad.nombre }}
+                    </option>
           </select>
         </div>
 
@@ -40,16 +42,17 @@
         <div class="filtro-item">
           <label for="area">Área</label>
           <select id="area" [(ngModel)]="filtros.area" class="select-filtro">
-            <option value="">Todas</option>
-            <option *ngFor="let a of areas" [value]="a">{{ a }}</option>
+              <option value="" selected disabled>Selecciona una</option>
+            <option *ngFor="let area of areas" [value]="area.nombre">{{ area.nombre }}</option>
           </select>
         </div>
+
 
         <!-- Horario -->
         <div class="filtro-item">
           <label for="horario">Turno</label>
           <select id="horario" [(ngModel)]="filtros.horario" class="select-filtro">
-            <option value="">Todos</option>
+             <option value="" selected disabled>Selecciona una</option>
             <option *ngFor="let turno of turnos" [value]="turno">{{ turno }}</option>
           </select>
         </div>
@@ -189,25 +192,23 @@
         </div>
 
         <!-- Botón postular al final -->
-<div class="botones-footer">
-  <button 
-  class="btn-postular" 
-  (click)="Postularse(selectedVacante.id)" 
-  [disabled]="selectedVacante.postulante">
-  <span>✓</span> 
-  {{ selectedVacante.postulante ? 'Ya estás postulado' : 'Postularme a esta vacante' }}
-</button>
+        <div class="botones-footer">
+          <button class="btn-postular" (click)="Postularse(selectedVacante.id)" [disabled]="selectedVacante.postulante">
+            <span>✓</span>
+            {{ selectedVacante.postulante ? 'Ya estás postulado' : 'Postularme a esta vacante' }}
+          </button>
 
-</div>
-    </div>
+        </div>
+      </div>
 
-    <!-- Mensaje cuando no hay vacante seleccionada -->
-    <div class="detalle-vacante empty-state" *ngIf="!selectedVacante">
-      <div class="empty-content">
-        <div class="empty-icon">🔍</div>
-        <h3>Selecciona una vacante</h3>
-        <p>Haz clic en cualquier vacante de la lista para ver sus detalles completos</p>
+      <!-- Mensaje cuando no hay vacante seleccionada -->
+      <div class="detalle-vacante empty-state" *ngIf="!selectedVacante">
+        <div class="empty-content">
+          <div class="empty-icon">🔍</div>
+          <h3>Selecciona una vacante</h3>
+          <p>Haz clic en cualquier vacante de la lista para ver sus detalles completos</p>
+        </div>
       </div>
     </div>
   </div>
-</div>
+  <app-chat></app-chat>

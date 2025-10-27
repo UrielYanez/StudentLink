@@ -2,11 +2,14 @@ export interface MatchingRequest {
   tipo: number;
   clienteId: number;
   salario?: number;
-  modalidad?: string;
   area?: string;
+  modalidad?: string;
   titulo?: string;
   horario?: string;
 }
+
+
+
 
 // 🔥 NUEVO: Interface para postulados
 export interface PostuladoMatch {

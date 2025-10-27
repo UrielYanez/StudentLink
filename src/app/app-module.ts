@@ -26,6 +26,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { homeMaching } from './matching/home/home';
 import { Maching } from './service/maching';
+import { Chat } from './components/chat/chat';
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import { Maching } from './service/maching';
      HttpClientModule,
        Nabvar,
     Login,
+    Chat,
     RouterModule,
     CommonModule,
     FormsModule
