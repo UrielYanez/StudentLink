@@ -23,6 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class Nabvar implements OnInit, OnDestroy {
   isLoggedIn = false;
   userName: string | null = null;
+   rol: string | null = null;
   private subscriptions: Subscription[] = [];
 
   constructor(private router: Router, private usuarioContext: UsuarioContextService) {}
@@ -33,6 +34,12 @@ export class Nabvar implements OnInit, OnDestroy {
       this.isLoggedIn = !!name;
     });
     this.subscriptions.push(sub1);
+
+     const userData = this.usuarioContext.getUserData();
+    if (userData) {
+      this.rol = userData.roles[0]; // Toma el primer elemento del arreglo
+    }
+
   }
 
   ngOnDestroy(): void {
@@ -81,4 +88,14 @@ export class Nabvar implements OnInit, OnDestroy {
   showGuestLinks(): boolean {
     return this.router.url === '/home' && !this.isLoggedIn;
   }
+  goHome(): void {
+  if (this.rol === 'USER') {
+    this.router.navigate(['/home/dashboard']);
+  } else if (this.rol === 'ADMIN') {
+    this.router.navigate(['/admin/dashboard']);
+  } else {
+    this.router.navigate(['/auth/login']); // ruta por defecto si no hay rol
+  }
+}
+
 }

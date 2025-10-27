@@ -101,11 +101,10 @@
     align-items: center;
     gap: 12px;
 
-  .user-button {
+ .user-button {
   display: flex !important;
   align-items: center !important;
-  flex-direction: row !important; // fuerza horizontal
-  justify-content: flex-start;
+  justify-content: flex-start !important;
   gap: 10px !important;
   padding: 6px 14px !important;
   border-radius: 24px;
@@ -114,15 +113,16 @@
   text-transform: none;
   font-weight: 500;
   white-space: nowrap;
-  overflow: hidden;
   height: 44px;
-  line-height: normal !important; // elimina altura extra del mat-button
-
+  min-width: fit-content;
+  
   .mdc-button__label {
-    display: flex;
-    align-items: center;
-    flex-direction: row !important;
-    gap: 10px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    width: 100%;
+    height: 100%;
   }
 
   .user-avatar {
@@ -141,10 +141,11 @@
   }
 
   .user-name {
-    flex: 1;
+    flex: 0 1 auto;
     font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &:hover {
@@ -180,18 +181,25 @@
   white-space: nowrap;
 }
 
-// Estilos del menú desplegable
 ::ng-deep {
   .mat-mdc-menu-panel {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-top: 8px;
-    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    margin-top: 8px !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   .mat-mdc-menu-content {
-    padding: 8px 0;
+    padding: 8px 0 !important;
+    background: #ffffff !important;
+  }
+
+  .mdc-menu-surface {
+    background: #ffffff !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
   }
 
   .mat-mdc-menu-item {
@@ -200,6 +208,7 @@
     padding: 12px 20px;
     transition: all 0.2s ease;
     min-height: 48px;
+    background: #ffffff !important;
 
     .mat-icon {
       margin-right: 12px;
@@ -208,7 +217,7 @@
     }
 
     &:hover {
-      background: linear-gradient(90deg, #f8f9ff 0%, #f1f3ff 100%);
+      background: linear-gradient(90deg, #f8f9ff 0%, #f1f3ff 100%) !important;
       
       .mat-icon {
         transform: scale(1.1);
@@ -222,6 +231,10 @@
 
       .mat-icon {
         color: #dc2626;
+      }
+
+      &:hover {
+        background: #fef2f2 !important;
       }
     }
   }
@@ -242,10 +255,8 @@
     }
 
     a[mat-stroked-button],
-    .user-button {
-      padding: 6px 16px;
-      font-size: 13px;
-    }
+   .user-button {
+    padding: 6px 12px !important;
 
     .user-name {
       display: none;
@@ -254,6 +265,7 @@
     .user-avatar {
       margin-right: 0;
     }
+  }
   }
 }
 
@@ -267,10 +279,4 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-::ng-deep .mdc-button__label {
-  display: flex !important;
-  align-items: center !important;
-  flex-direction: row !important;
-  gap: 10px !important;
 }
