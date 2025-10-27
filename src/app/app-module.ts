@@ -28,6 +28,7 @@ import { Maching } from './service/maching';
 import { PerfilUsuarioComponent } from './users/perfil-usuario-component/perfil-usuario-component';
 import { SlugifyPipe } from './pipes/slugify-pipe';
 import { CvComponent } from './users/cv-component/cv-component';
+import { Chat } from './components/chat/chat';
 
 
 @NgModule({
@@ -63,6 +64,7 @@ import { CvComponent } from './users/cv-component/cv-component';
     HttpClientModule,
     Nabvar,
     Login,
+    Chat,
     RouterModule,
     CommonModule,
     FormsModule,
