@@ -1,18 +1,14 @@
-import { VacanteMatch } from "./maching";
-
 export interface Vacante {
   id?: number;
   titulo: string;
   descripcion: string;
   salario: number;
-  ubicacion: string;
   tipoContrato: string;
   solicitudesPermitidas: number;
   estado: string;
   fechaCreacion?: string;
   fechaExpiracion: string;
   beneficios?: string;
-  empresa: string;
   horaInicio?: string;
   horaFin?: string;
   diasLaborales?: string;
@@ -23,18 +19,15 @@ export interface Vacante {
   modalidad?: Modalidad;
   habilidades?: Habilidad[];
   idiomas?: Idioma[];
-  // Agrega esta propiedad para el matching
-  // matching?: VacanteMatch[];
-  // 🔥 NUEVO: Campos para matching y postulados
   postulados?: any[];
   porcentajeMatch?: number;
   habilidadesMatch?: any[];
   idiomasMatch?: any[];
   areaMatch?: any;
   salarioMatch?: any;
+  empresaId?: number;
 }
 
-// 🔥 NUEVO: Interfaces para postulados y matching
 export interface Postulado {
   usuario_id: number;
   username: string;
@@ -50,13 +43,12 @@ export interface VacanteRequest {
   titulo: string;
   descripcion: string;
   salario: number;
-  ubicacion: string;
   tipoContrato: string;
   solicitudesPermitidas: number;
   estado?: string;
   fechaExpiracion: string;
   beneficios?: string;
-  empresa: string;
+  empresaId: number;
   horaInicio?: string;
   horaFin?: string;
   diasLaborales?: string;
@@ -72,14 +64,14 @@ export interface VacanteRequest {
 export interface VacanteConPostulados {
   vacante_id: number;
   titulo: string;
-  empresa: string;
+  empresaId: number;
+  empresaNombre?: string;
   salario: number;
   area: string;
   modalidad: string;
   habilidades: string[];
   idiomas: string[];
   descripcion: string;
-  ubicacion: string;
   tipoContrato: string;
   solicitudesPermitidas: number;
   estado: string;
