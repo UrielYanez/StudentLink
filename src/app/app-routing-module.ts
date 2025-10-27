@@ -7,6 +7,8 @@ import { homeMaching } from './matching/home/home';
 import { AuthGuard } from './auth/Guard/auth-guard';
 import { VacanteListComponent } from './reclutador/vacante-list-component/vacante-list-component';
 import { VacanteFormComponent } from './reclutador/vacante-form-component/vacante-form-component';
+import { PerfilUsuarioComponent } from './users/perfil-usuario-component/perfil-usuario-component';
+import { CvComponent } from './users/cv-component/cv-component';
 const routes: Routes = [
   {
     path: '',
@@ -15,6 +17,10 @@ const routes: Routes = [
   },
   { path: 'home', component: homePrinciapal },
   { path: 'auth/login', component: Login },
+
+  { path: 'profile', component: PerfilUsuarioComponent },
+  { path: 'cv/:id/:slug', component: CvComponent },
+  { path: 'editar-cv/:id/:slug', component: CvComponent },
 
   //Rutas Reclutador
   { path: 'reclutador/vacantes' , component: VacanteListComponent},

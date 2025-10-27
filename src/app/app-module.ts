@@ -9,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
@@ -17,7 +17,7 @@ import { Nabvar } from './components/nabvar/nabvar';
 import { Footer } from './components/footer/footer';
 import { Errorpage } from './components/errorpage/errorpage';
 import { Login } from './auth/login/login';
-import { homePrinciapal} from './components/home/home';
+import { homePrinciapal } from './components/home/home';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './auth/Interceptor/auth-interceptor';
 import { VacanteListComponent } from './reclutador/vacante-list-component/vacante-list-component';
@@ -26,6 +26,10 @@ import { RouterModule } from '@angular/router';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { homeMaching } from './matching/home/home';
 import { Maching } from './service/maching';
+import { PerfilUsuarioComponent } from './users/perfil-usuario-component/perfil-usuario-component';
+import { SlugifyPipe } from './pipes/slugify-pipe';
+import { CvComponent } from './users/cv-component/cv-component';
+
 
 @NgModule({
   declarations: [
@@ -36,7 +40,11 @@ import { Maching } from './service/maching';
     homeMaching,
     VacanteListComponent,
     VacanteFormComponent,
-    homeMaching
+    homeMaching,
+    PerfilUsuarioComponent,
+    SlugifyPipe,
+    CvComponent,
+
   ],
   imports: [
     BrowserModule,
@@ -46,21 +54,22 @@ import { Maching } from './service/maching';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
-    FormsModule ,
+    FormsModule,
     MatCardModule,        // <<--- IMPORTANTE
     MatFormFieldModule,   // <<--- IMPORTANTE
     MatInputModule,        // <<--- IMPORTANTE
     MatCheckboxModule,
-     BrowserAnimationsModule,
-      FormsModule,
-     HttpClientModule,
-       Nabvar,
+    BrowserAnimationsModule,
+    FormsModule,
+    HttpClientModule,
+    Nabvar,
     Login,
     RouterModule,
     CommonModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
-  providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     DecimalPipe,
     Maching
   ],

@@ -1,0 +1,217 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-lg-10 offset-lg-1">
+
+      <div *ngIf="cargando" class="cv-loading text-center p-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-3">Cargando editor de CV...</p>
+      </div>
+      
+      <form [formGroup]="cvForm" (ngSubmit)="onSubmit()" *ngIf="!cargando" novalidate>
+
+        <div class="cv-editor-header">
+          <h2>Editor de Currículum</h2>
+          <div>
+            <button type="button" (click)="volverAlPerfil()" class="btn btn-secondary me-2">
+              Cancelar y Volver al Perfil
+            </button>
+            <button type="submit" class="btn btn-primary btn-lg" [disabled]="cvForm.invalid || cargando">
+              Guardar Cambios del CV
+            </button>
+          </div>
+        </div>
+
+        <div class="cv-section card" formArrayName="experienciaLaboral">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Experiencia Laboral</h4>
+            <button type="button" (click)="addExperiencia()" class="btn btn-sm btn-success">
+              <i class="bi bi-plus-lg"></i> Añadir Experiencia
+            </button>
+          </div>
+
+          <div *ngIf="experienciaLaboral.controls.length === 0" class="card-body text-center text-muted">
+            Aún no has añadido experiencia laboral.
+          </div>
+
+          <div *ngFor="let exp of experienciaLaboral.controls; let i=index" [formGroupName]="i"
+            class="card-body item-form">
+            <div class="row g-3">
+              <div class="col-md-6 form-group">
+                <label [for]="'empresa'+i">Empresa *</label>
+                <input type="text" [id]="'empresa'+i" formControlName="empresa" class="form-control"
+                  [class.is-invalid]="exp.get('empresa')?.invalid && exp.get('empresa')?.touched">
+              </div>
+              <div class="col-md-6 form-group">
+                <label [for]="'cargo'+i">Cargo *</label>
+                <input type="text" [id]="'cargo'+i" formControlName="cargo" class="form-control"
+                  [class.is-invalid]="exp.get('cargo')?.invalid && exp.get('cargo')?.touched">
+              </div>
+            </div>
+            <div class="form-group mt-2"> <label [for]="'desc'+i">Descripción *</label>
+              <textarea [id]="'desc'+i" formControlName="descripcion" class="form-control" rows="3"
+                [class.is-invalid]="exp.get('descripcion')?.invalid && exp.get('descripcion')?.touched"></textarea>
+            </div>
+            <button type="button" (click)="removeExperiencia(i)" class="btn btn-sm btn-outline-danger btn-remove"
+              title="Eliminar esta experiencia">
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+
+
+        <div class="cv-section card" formArrayName="educacion">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Educación</h4>
+            <button type="button" (click)="addEducacion()" class="btn btn-sm btn-success">
+              <i class="bi bi-plus-lg"></i> Añadir Educación
+            </button>
+          </div>
+
+          <div *ngIf="educacion.controls.length === 0" class="card-body text-center text-muted">
+            Aún no has añadido información sobre tu educación.
+          </div>
+
+          <div *ngFor="let edu of educacion.controls; let i=index" [formGroupName]="i" class="card-body item-form">
+            <div class="row g-3">
+              <div class="col-md-6 form-group">
+                <label [for]="'uni'+i">Universidad *</label>
+                <input type="text" [id]="'uni'+i" formControlName="universidad" class="form-control"
+                  [class.is-invalid]="edu.get('universidad')?.invalid && edu.get('universidad')?.touched">
+              </div>
+              <div class="col-md-6 form-group">
+                <label [for]="'carrera'+i">Carrera / Título *</label>
+                <input type="text" [id]="'carrera'+i" formControlName="carrera" class="form-control"
+                  [class.is-invalid]="edu.get('carrera')?.invalid && edu.get('carrera')?.touched">
+              </div>
+            </div>
+            <div class="row g-3 mt-1">
+              <div class="col-md-6 form-group">
+                <label [for]="'inicio'+i">Fecha Inicio *</label>
+                <input type="date" [id]="'inicio'+i" formControlName="fecha_inicio" class="form-control"
+                  [class.is-invalid]="edu.get('fecha_inicio')?.invalid && edu.get('fecha_inicio')?.touched">
+              </div>
+              <div class="col-md-6 form-group">
+                <label [for]="'fin'+i">Fecha Fin *</label>
+                <input type="date" [id]="'fin'+i" formControlName="fecha_fin" class="form-control"
+                  [class.is-invalid]="edu.get('fecha_fin')?.invalid && edu.get('fecha_fin')?.touched">
+              </div>
+            </div>
+            <button type="button" (click)="removeEducacion(i)" class="btn btn-sm btn-outline-danger btn-remove"
+              title="Eliminar esta educación">
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+
+
+        <div class="cv-section card" formArrayName="cursos">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Cursos y Certificaciones</h4>
+            <button type="button" (click)="addCurso()" class="btn btn-sm btn-success">
+              <i class="bi bi-plus-lg"></i> Añadir Curso
+            </button>
+          </div>
+
+          <div *ngIf="cursos.controls.length === 0" class="card-body text-center text-muted">
+            Aún no has añadido cursos o certificaciones.
+          </div>
+
+          <div *ngFor="let curso of cursos.controls; let i=index" [formGroupName]="i" class="card-body item-form">
+            <div class="form-group">
+              <label [for]="'nomCurso'+i">Nombre del Curso *</label>
+              <input type="text" [id]="'nomCurso'+i" formControlName="nombre_curso" class="form-control"
+                [class.is-invalid]="curso.get('nombre_curso')?.invalid && curso.get('nombre_curso')?.touched">
+            </div>
+            <div class="form-group mt-2">
+              <label [for]="'descCurso'+i">Descripción *</label>
+              <input type="text" [id]="'descCurso'+i" formControlName="descripcion" class="form-control"
+                [class.is-invalid]="curso.get('descripcion')?.invalid && curso.get('descripcion')?.touched">
+            </div>
+            <div class="form-group mt-2">
+              <label [for]="'linkCurso'+i">Link del Certificado (Opcional)</label>
+              <input type="url" [id]="'linkCurso'+i" formControlName="curso" class="form-control">
+            </div>
+            <button type="button" (click)="removeCurso(i)" class="btn btn-sm btn-outline-danger btn-remove"
+              title="Eliminar este curso">
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+
+
+        <div class="cv-section card" formArrayName="habilidades">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Habilidades</h4>
+            <button type="button" (click)="addHabilidad()" class="btn btn-sm btn-success">
+              <i class="bi bi-plus-lg"></i> Añadir Habilidad
+            </button>
+          </div>
+
+          <div *ngIf="habilidades.controls.length === 0" class="card-body text-center text-muted">
+            Aún no has añadido habilidades.
+          </div>
+
+          <div *ngFor="let skill of habilidades.controls; let i=index" [formGroupName]="i"
+            class="card-body item-form-simple">
+            <div class="form-group flex-grow-1"> <label [for]="'skill'+i">Habilidad *</label>
+              <select [id]="'skill'+i" formControlName="id_habilidad" class="form-control"
+                [class.is-invalid]="skill.get('id_habilidad')?.invalid && skill.get('id_habilidad')?.touched">
+                <option [ngValue]="null" disabled>-- Selecciona una habilidad --</option>
+                <option *ngFor="let item of listaTodasHabilidades" [ngValue]="item.id">
+                  {{ item.nombre }}
+                </option>
+              </select>
+            </div>
+            <button type="button" (click)="removeHabilidad(i)" class="btn btn-sm btn-outline-danger btn-remove-inline"
+              title="Eliminar esta habilidad">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+
+
+        <div class="cv-section card" formArrayName="idiomas">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Idiomas</h4>
+            <button type="button" (click)="addIdioma()" class="btn btn-sm btn-success">
+              <i class="bi bi-plus-lg"></i> Añadir Idioma
+            </button>
+          </div>
+
+          <div *ngIf="idiomas.controls.length === 0" class="card-body text-center text-muted">
+            Aún no has añadido idiomas.
+          </div>
+
+          <div *ngFor="let idioma of idiomas.controls; let i=index" [formGroupName]="i"
+            class="card-body item-form-simple">
+            <div class="form-group flex-grow-1">
+              <label [for]="'idioma'+i">Idioma *</label>
+              <select [id]="'idioma'+i" formControlName="id_idioma" class="form-control"
+                [class.is-invalid]="idioma.get('id_idioma')?.invalid && idioma.get('id_idioma')?.touched">
+                <option [ngValue]="null" disabled>-- Selecciona un idioma --</option>
+                <option *ngFor="let item of listaTodosIdiomas" [ngValue]="item.id">
+                  {{ item.idioma }}
+                </option>
+              </select>
+            </div>
+            <button type="button" (click)="removeIdioma(i)" class="btn btn-sm btn-outline-danger btn-remove-inline"
+              title="Eliminar este idioma">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+
+
+        <div class="text-end mt-4">
+          <button type="button" (click)="volverAlPerfil()" class="btn btn-secondary me-2">
+            Cancelar y Volver al Perfil
+          </button>
+          <button type="submit" class="btn btn-primary btn-lg" [disabled]="cvForm.invalid || cargando">
+            Guardar Cambios del CV
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,220 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+
+      <div *ngIf="cargando" class="text-center p-5 loading-overlay-container">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-3">Cargando datos del perfil...</p>
+      </div>
+
+      <div *ngIf="!cargando">
+
+        <h2 class="page-title">
+          <span *ngIf="modo === 'crear'">Crear mi Perfil de Usuario</span>
+          <span *ngIf="modo === 'editar'">Editar mi Perfil de Usuario</span>
+        </h2>
+
+        <div *ngIf="modo === 'editar'" class="profile-header-actions card mb-4 p-3">
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div class="profile-info-compact">
+              <h3 class="mb-0">{{ nombreUsuario }}</h3>
+              <p class="text-muted small">{{ emailUsuario }}</p>
+            </div>
+
+            <div class="cv-actions d-flex gap-2">
+
+              <a [routerLink]="['/editar-cv', idUsuarioAuth, nombreUsuario | slugify]"
+                 class="btn btn-primary">
+                <i class="bi bi-pencil-square me-1"></i> Editar CV
+              </a>
+
+              <button (click)="toggleCvDisplay()"
+                      [class.btn-outline-primary]="!mostrarCV"
+                      [class.btn-secondary]="mostrarCV"
+                      class="btn">
+                <i class="bi me-1" [class.bi-eye-fill]="!mostrarCV" [class.bi-eye-slash-fill]="mostrarCV"></i>
+                {{ mostrarCV ? 'Ocultar CV' : 'Ver CV' }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="perfil-container">
+
+          <form [formGroup]="perfilForm" (ngSubmit)="onSubmit()">
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="salario">Salario deseado (MXN):</label>
+                  <input type="number" id="salario" formControlName="salario" class="form-control">
+                  <div *ngIf="perfilForm.get('salario')?.invalid && perfilForm.get('salario')?.touched"
+                    class="text-danger small">
+                    El salario es requerido y debe ser mayor a 0.
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="id_area">Área de interés:</label>
+                  <select id="id_area" formControlName="id_area" class="form-control">
+                    <option [ngValue]="null" disabled>-- Seleccione un área --</option>
+                    <option *ngFor="let area of listaAreas" [value]="area.id">
+                      {{ area.nombre }}
+                    </option>
+                  </select>
+                  <div *ngIf="perfilForm.get('id_area')?.invalid && perfilForm.get('id_area')?.touched"
+                    class="text-danger small">
+                    El área es requerida.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+            <h3>Dirección</h3>
+
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="codigo_postal">Código Postal:</label>
+                  <input type="text" id="codigo_postal" formControlName="codigo_postal" maxlength="5" class="form-control">
+                  <div *ngIf="errorCP" class="text-danger small">{{ errorCP }}</div>
+                  <div *ngIf="perfilForm.get('codigo_postal')?.invalid && perfilForm.get('codigo_postal')?.touched"
+                    class="text-danger small">
+                    El CP es requerido y debe tener 5 dígitos.
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="estado">Estado:</label>
+                  <input type="text" id="estado" formControlName="estado" class="form-control" readonly>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="municipio">Municipio:</label>
+                  <input type="text" id="municipio" formControlName="municipio" class="form-control" readonly>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="colonia">Colonia:</label>
+              <select id="colonia" formControlName="colonia" class="form-control">
+                <option value="" disabled>-- Seleccione una colonia --</option>
+                <option *ngFor="let col of listaColonias" [value]="col">
+                  {{ col }}
+                </option>
+              </select>
+              <div *ngIf="perfilForm.get('colonia')?.invalid && perfilForm.get('colonia')?.touched"
+                class="text-danger small">
+                Debe seleccionar una colonia.
+              </div>
+            </div>
+
+            <hr>
+
+            <button type="submit" class="btn btn-primary btn-lg" [disabled]="perfilForm.invalid || cargando">
+              <span *ngIf="modo === 'crear'">Guardar Perfil</span>
+              <span *ngIf="modo === 'editar'">Actualizar Perfil</span>
+            </button>
+
+          </form>
+        </div>
+
+
+        <div *ngIf="mostrarCV" class="mt-4">
+          <div class="row">
+            <div class="col-md-10 offset-md-1">
+              <div class="cv-anidado-container">
+
+                <div *ngIf="cargandoCV" class="cv-loading text-center p-5">
+                  <div class="spinner-border text-primary" role="status"></div>
+                  <p class="mt-3">Cargando CV...</p>
+                </div>
+
+                <div *ngIf="errorCV && !cargandoCV" class="alert alert-warning">
+                  {{ errorCV }}
+                </div>
+
+                <div *ngIf="cvData && !cargandoCV" class="cv-container-visualizador">
+
+                  <div class="cv-header compact-header">
+                    <h2 class="mb-0">Curriculum Vitae</h2>
+                    <a [href]="'http://localhost:3000/api/usuarios/' + idUsuarioAuth + '/cv/pdf'" target="_blank"
+                       class="btn btn-sm btn-success">
+                      <i class="bi bi-file-pdf-fill me-1"></i> Visualizar PDF
+                    </a>
+                  </div>
+
+
+                  <div class="cv-section card">
+                    <h4 class="card-header">Experiencia Laboral</h4>
+                    <div class="card-body">
+                      <div *ngIf="!cvData.experienciaLaboral?.length" class="text-muted small">Sin experiencia
+                        registrada.</div>
+                      <div *ngFor="let exp of cvData.experienciaLaboral" class="timeline-item">
+                        <h5>{{ exp.cargo }}</h5>
+                        <p class="text-primary mb-1">{{ exp.empresa }}</p>
+                        <p>{{ exp.descripcion }}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cv-section card">
+                    <h4 class="card-header">Educación</h4>
+                    <div class="card-body">
+                      <div *ngIf="!cvData.educacion?.length" class="text-muted small">Sin educación registrada.</div>
+                      <div *ngFor="let edu of cvData.educacion" class="timeline-item">
+                        <h5>{{ edu.carrera }}</h5>
+                        <p class="text-primary mb-1">{{ edu.universidad }}</p>
+                        <p class="text-muted small">
+                          {{ edu.fecha_inicio | date:'MM/yyyy' }} - {{ edu.fecha_fin | date:'MM/yyyy' }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cv-section card">
+                    <h4 class="card-header">Cursos y Certificaciones</h4>
+                    <div class="card-body">
+                      <div *ngIf="!cvData.cursos?.length" class="text-muted small">Sin cursos registrados.</div>
+                      <div *ngFor="let curso of cvData.cursos" class="timeline-item">
+                        <h5>{{ curso.nombre_curso }}</h5>
+                        <p>{{ curso.descripcion }}</p>
+                        <a *ngIf="curso.curso" [href]="curso.curso" target="_blank"
+                          class="btn btn-sm btn-outline-primary">Ver Certificado</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cv-section card">
+                    <h4 class="card-header">Habilidades Técnicas</h4>
+                    <div class="card-body pill-container">
+                      <div *ngIf="!cvData.habilidades?.length" class="text-muted small">Sin habilidades registradas.
+                      </div>
+                      <span *ngFor="let skill of cvData.habilidades" class="badge bg-primary pill">{{ skill.nombre
+                        }}</span>
+                    </div>
+                  </div>
+
+                  <div class="cv-section card">
+                    <h4 class="card-header">Idiomas</h4>
+                    <div class="card-body pill-container">
+                      <div *ngIf="!cvData.idiomas?.length" class="text-muted small">Sin idiomas registrados.</div>
+                      <span *ngFor="let idioma of cvData.idiomas" class="badge bg-secondary pill">{{ idioma.idioma
+                        }}</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
