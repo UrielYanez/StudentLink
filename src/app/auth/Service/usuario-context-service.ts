@@ -6,6 +6,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 interface UserData {
     name: string;
     roles: string[];
+    email:string;
     id?: number;
     empresaId?: number;
 }

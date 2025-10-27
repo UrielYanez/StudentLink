@@ -69,7 +69,8 @@ login(email: string, password: string): Observable<LoginResponse> {
       id: userData.id,
       name: userData.username || userData.email,
       roles,
-        empresaId: empresaId
+        empresaId: empresaId,
+        email:userData.email
     };
      localStorage.setItem('user', JSON.stringify(userToStore));
     this.usuarioContextService.setUsuarioData(userToStore);
