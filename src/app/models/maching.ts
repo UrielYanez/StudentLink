@@ -64,6 +64,8 @@ export interface VacanteMatch {
   salario_match: SalarioMatch;
   porcentaje_match: number;
   postulante?: boolean;
-  // 🔥 NUEVO: Campo para postulados (solo en tipo 2)
   postulados?: PostuladoMatch[];
+
+  match_competencia?: number[];
+  estado?: string;
 }
