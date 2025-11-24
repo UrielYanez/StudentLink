@@ -3,8 +3,10 @@
   <div class="filtros-container" [class.expanded]="mostrarFiltros">
     <div class="filtros-header">
       <div class="filtros-title">
-        <h3> Filtros de búsqueda</h3>
-        <span class="badge-filtros" *ngIf="hayFiltrosActivos()">{{ hayFiltrosActivos() ? 'Activos' : '' }}</span>
+        <h3>Filtros de búsqueda</h3>
+        <span class="badge-filtros" *ngIf="hayFiltrosActivos()">{{
+          hayFiltrosActivos() ? 'Activos' : ''
+        }}</span>
       </div>
       <button class="btn-toggle-filtros" (click)="toggleFiltros()">
         {{ mostrarFiltros ? '▲ Ocultar' : '▼ Mostrar filtros' }}
@@ -16,25 +18,36 @@
         <!-- Título -->
         <div class="filtro-item">
           <label for="titulo">Título del puesto</label>
-          <input type="text" id="titulo" [(ngModel)]="filtros.titulo" placeholder="Ej: Desarrollador, Contador..."
-            class="input-filtro">
+          <input
+            type="text"
+            id="titulo"
+            [(ngModel)]="filtros.titulo"
+            placeholder="Ej: Desarrollador, Contador..."
+            class="input-filtro"
+          />
         </div>
 
         <!-- Salario -->
         <div class="filtro-item">
           <label for="salario">Salario mínimo</label>
-          <input type="number" id="salario" [(ngModel)]="filtros.salario" placeholder="Ej: 30000" class="input-filtro"
-            min="0">
+          <input
+            type="number"
+            id="salario"
+            [(ngModel)]="filtros.salario"
+            placeholder="Ej: 30000"
+            class="input-filtro"
+            min="0"
+          />
         </div>
 
         <!-- Modalidad -->
         <div class="filtro-item">
           <label for="modalidad">Modalidad</label>
           <select id="modalidad" [(ngModel)]="filtros.modalidad" class="select-filtro">
-              <option value="" selected disabled>Selecciona una</option>
-             <option *ngFor="let modalidad of modalidades" [value]="modalidad.nombre">
-                      {{ modalidad.nombre }}
-                    </option>
+            <option value="" selected disabled>Selecciona una</option>
+            <option *ngFor="let modalidad of modalidades" [value]="modalidad.nombre">
+              {{ modalidad.nombre }}
+            </option>
           </select>
         </div>
 
@@ -42,17 +55,16 @@
         <div class="filtro-item">
           <label for="area">Área</label>
           <select id="area" [(ngModel)]="filtros.area" class="select-filtro">
-              <option value="" selected disabled>Selecciona una</option>
+            <option value="" selected disabled>Selecciona una</option>
             <option *ngFor="let area of areas" [value]="area.nombre">{{ area.nombre }}</option>
           </select>
         </div>
-
 
         <!-- Horario -->
         <div class="filtro-item">
           <label for="horario">Turno</label>
           <select id="horario" [(ngModel)]="filtros.horario" class="select-filtro">
-             <option value="" selected disabled>Selecciona una</option>
+            <option value="" selected disabled>Selecciona una</option>
             <option *ngFor="let turno of turnos" [value]="turno">{{ turno }}</option>
           </select>
         </div>
@@ -62,7 +74,11 @@
         <button class="btn-aplicar" (click)="aplicarFiltros()" [disabled]="aplicandoFiltros">
           {{ aplicandoFiltros ? 'Aplicando...' : '✓ Aplicar filtros' }}
         </button>
-        <button class="btn-limpiar" (click)="limpiarFiltros()" [disabled]="aplicandoFiltros || !hayFiltrosActivos()">
+        <button
+          class="btn-limpiar"
+          (click)="limpiarFiltros()"
+          [disabled]="aplicandoFiltros || !hayFiltrosActivos()"
+        >
           ✕ Limpiar filtros
         </button>
       </div>
@@ -78,15 +94,21 @@
         <p class="total-vacantes">{{ cantidadOfertas }} oportunidades</p>
       </div>
 
-      <div class="vacante-card" *ngFor="let oferta of ofertas" [class.selected]="oferta.id === selectedVacante?.id"
-        (click)="selectVacante(oferta)">
+      <div
+        class="vacante-card"
+        *ngFor="let oferta of ofertas"
+        [class.selected]="oferta.id === selectedVacante?.id"
+        (click)="selectVacante(oferta)"
+      >
         <div class="card-header">
           <h4>{{ oferta.titulo !== 'true' ? oferta.titulo : 'Vacante' }}</h4>
           <span class="match-badge" [class.high-match]="oferta.porcentaje_match >= 70">
             {{ oferta.porcentaje_match }}% match
           </span>
         </div>
-        <p class="empresa"><strong>{{ oferta.empresa }}</strong></p>
+        <p class="empresa">
+          <strong>{{ oferta.empresa }}</strong>
+        </p>
         <div class="card-info">
           <span class="info-item">📍 {{ oferta.ubicacion }}</span>
           <span class="info-item">💼 {{ oferta.modalidad }}</span>
@@ -121,6 +143,17 @@
             <span class="match-percentage">{{ selectedVacante.porcentaje_match }}%</span>
             <span class="match-label">Match</span>
           </div>
+          <!-- Nueva sección para el botón de análisis de competencia -->
+          <div class="seccion">
+            <div class="competencia-info">
+              <button
+                class="btn-analizar-competencia"
+                (click)="abrirModalCompetencia(selectedVacante)"
+              >
+                📊
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="info-grid">
@@ -140,17 +173,29 @@
           </div>
           <div class="info-card">
             <span class="info-label">Días laborales</span>
-            <span class="info-value">{{ selectedVacante.dias_laborales || 'No especificado' }}</span>
+            <span class="info-value">{{
+              selectedVacante.dias_laborales || 'No especificado'
+            }}</span>
           </div>
         </div>
 
         <!-- Habilidades requeridas -->
-        <div class="seccion"
-          *ngIf="selectedVacante.habilidades && selectedVacante.habilidades.length > 0 && selectedVacante.habilidades[0].nombre">
+        <div
+          class="seccion"
+          *ngIf="
+            selectedVacante.habilidades &&
+            selectedVacante.habilidades.length > 0 &&
+            selectedVacante.habilidades[0].nombre
+          "
+        >
           <h3>Habilidades requeridas</h3>
           <div class="tags-container">
-            <span *ngFor="let habilidad of selectedVacante.habilidades" class="tag" [class.tag-match]="habilidad.status"
-              [class.tag-no-match]="habilidad.status === false">
+            <span
+              *ngFor="let habilidad of selectedVacante.habilidades"
+              class="tag"
+              [class.tag-match]="habilidad.status"
+              [class.tag-no-match]="habilidad.status === false"
+            >
               {{ habilidad.nombre }}
               <span class="tag-icon" *ngIf="habilidad.status">✓</span>
             </span>
@@ -158,12 +203,22 @@
         </div>
 
         <!-- Idiomas -->
-        <div class="seccion"
-          *ngIf="selectedVacante.idiomas && selectedVacante.idiomas.length > 0 && selectedVacante.idiomas[0].nombre">
+        <div
+          class="seccion"
+          *ngIf="
+            selectedVacante.idiomas &&
+            selectedVacante.idiomas.length > 0 &&
+            selectedVacante.idiomas[0].nombre
+          "
+        >
           <h3>Idiomas</h3>
           <div class="tags-container">
-            <span *ngFor="let idioma of selectedVacante.idiomas" class="tag" [class.tag-match]="idioma.status"
-              [class.tag-no-match]="idioma.status === false">
+            <span
+              *ngFor="let idioma of selectedVacante.idiomas"
+              class="tag"
+              [class.tag-match]="idioma.status"
+              [class.tag-no-match]="idioma.status === false"
+            >
               {{ idioma.nombre }}
               <span class="tag-icon" *ngIf="idioma.status">✓</span>
             </span>
@@ -193,22 +248,145 @@
 
         <!-- Botón postular al final -->
         <div class="botones-footer">
-          <button class="btn-postular" (click)="Postularse(selectedVacante.id)" [disabled]="selectedVacante.postulante">
+          <button
+            class="btn-postular"
+            (click)="Postularse(selectedVacante.id)"
+            [disabled]="selectedVacante.postulante"
+          >
             <span>✓</span>
             {{ selectedVacante.postulante ? 'Ya estás postulado' : 'Postularme a esta vacante' }}
           </button>
-
-        </div>
-      </div>
-
-      <!-- Mensaje cuando no hay vacante seleccionada -->
-      <div class="detalle-vacante empty-state" *ngIf="!selectedVacante">
-        <div class="empty-content">
-          <div class="empty-icon">🔍</div>
-          <h3>Selecciona una vacante</h3>
-          <p>Haz clic en cualquier vacante de la lista para ver sus detalles completos</p>
         </div>
       </div>
     </div>
+
+    <!-- Mensaje cuando no hay vacante seleccionada -->
+    <div class="detalle-vacante empty-state" *ngIf="!selectedVacante">
+      <div class="empty-content">
+        <div class="empty-icon">🔍</div>
+        <h3>Selecciona una vacante</h3>
+        <p>Haz clic en cualquier vacante de la lista para ver sus detalles completos</p>
+      </div>
+    </div>
   </div>
+
+  <!-- Modal de Análisis de Competencia -->
+  <!-- El componente app-match-chart ahora se suscribe automáticamente -->
+  <div class="modal-backdrop" *ngIf="mostrarModalCompetencia" (click)="cerrarModalCompetencia()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📊 Análisis de Competencia</h3>
+        <button class="btn-cerrar-modal" (click)="cerrarModalCompetencia()">×</button>
+      </div>
+
+      <div class="modal-body" *ngIf="vacanteCompetencia">
+        <!-- Información de la vacante -->
+        <div class="vacante-info-modal">
+          <h4>{{ vacanteCompetencia.titulo }}</h4>
+          <p class="empresa-modal">{{ vacanteCompetencia.empresa }}</p>
+          <div class="match-info">
+            <div class="match-badge-large">
+              <span class="match-number">{{ vacanteCompetencia.porcentaje_match }}%</span>
+              <span class="match-text">Tu Match</span>
+            </div>
+            <div class="postulantes-info">
+              <span class="postulantes-number">
+                {{ vacanteCompetencia.match_competencia?.length || 0 }}
+              </span>
+              <span class="postulantes-text">Postulante(s)</span>
+            </div>
+          </div>
+        </div>
+
+        <!--
+        PATRÓN OBSERVER EN ACCIÓN:
+        El componente app-match-chart se suscribe automáticamente
+        al CompetenciaObserverService en su ngOnInit().
+
+        Cuando abrimos el modal (abrirModalCompetencia),
+        se llama a competenciaService.notificarCambio()
+        y TODOS los componentes suscritos reciben los datos.
+      -->
+        <div class="grafica-container">
+          <app-match-chart></app-match-chart>
+        </div>
+
+        <!-- Estadísticas y Recomendaciones -->
+        <div
+          class="estadisticas-container"
+          *ngIf="
+            vacanteCompetencia.match_competencia && vacanteCompetencia.match_competencia.length > 0
+          "
+        >
+          <h5>📈 Análisis Detallado</h5>
+
+          <div class="estadisticas-grid">
+            <div class="estadistica-item">
+              <span class="estadistica-icon">📊</span>
+              <span class="estadistica-label">Match Promedio</span>
+              <span class="estadistica-valor">
+                {{ getPromedioCompetencia(vacanteCompetencia) }}%
+              </span>
+            </div>
+
+            <div class="estadistica-item">
+              <span class="estadistica-icon">⚡</span>
+              <span class="estadistica-label">Tu Posición</span>
+              <span class="estadistica-valor" [class]="getClasePosicion(vacanteCompetencia)">
+                {{ getPosicionRanking(vacanteCompetencia) }}
+              </span>
+            </div>
+
+            <div class="estadistica-item full-width">
+              <span class="estadistica-icon">📉</span>
+              <span class="estadistica-label">Nivel de Dificultad</span>
+              <span
+                class="estadistica-valor"
+                [class]="getNivelDificultad(vacanteCompetencia).clase"
+              >
+                {{ getNivelDificultad(vacanteCompetencia).texto }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Recomendación Principal -->
+          <div
+            class="recomendacion-principal"
+            [class]="getNivelDificultad(vacanteCompetencia).clase"
+          >
+            <div class="recomendacion-header">
+              <h6>💡 Recomendación</h6>
+            </div>
+            <p class="recomendacion-texto">{{ getRecomendaciones(vacanteCompetencia) }}</p>
+          </div>
+        </div>
+
+        <!-- Caso sin competencia -->
+        <div
+          class="sin-competencia"
+          *ngIf="
+            !vacanteCompetencia.match_competencia ||
+            vacanteCompetencia.match_competencia.length === 0
+          "
+        >
+          <div class="sin-competencia-icon">🎯</div>
+          <h5>¡Excelente oportunidad!</h5>
+          <p>Serías el primer postulante para esta vacante. ¡No pierdas esta oportunidad!</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cerrarModalCompetencia()">Cerrar</button>
+        <button
+          class="btn btn-primary"
+          (click)="Postularse(vacanteCompetencia!.id); cerrarModalCompetencia()"
+          [disabled]="vacanteCompetencia?.postulante"
+        >
+          <span *ngIf="!vacanteCompetencia?.postulante"> Postularme Ahora</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <app-chat></app-chat>
+</div>
