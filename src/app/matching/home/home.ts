@@ -59,7 +59,8 @@ export class homeMaching implements OnInit {
         this.idUsuarioGlobal = userData.id ?? null;
 
         console.log('Usuario cargado:', userData);
-        this.cargarVacantesIniciales(); // 👈 Ya tienes el ID aquí
+       // this.obtenerMatching(); // 👈 Ya tienes el ID aquí
+        this.obtenerMatching();
       }
     });
 
@@ -70,7 +71,8 @@ export class homeMaching implements OnInit {
       this.emailll = userData.email;
       console.log(this.emailll)
       this.idUsuarioGlobal = userData.id ?? null;
-      this.cargarVacantesIniciales(); // 👈 se ejecuta si ya había datos guardados
+    //  this.obtenerMatching(); // 👈 se ejecuta si ya había datos guardados
+     this.obtenerMatching();
     }
   }
 
@@ -157,7 +159,7 @@ export class homeMaching implements OnInit {
       tipo: this.tipo,
       clienteId: this.idUsuarioGlobal!
     };
-    this.cargarVacantesIniciales();
+    this.obtenerMatching();
   }
 
   /**
@@ -230,7 +232,7 @@ tieneDatosCompetencia(): boolean {
             });
 
           }
-          this.cargarVacantesIniciales();
+          this.obtenerMatching();
         }
         // Si devuelve un array (por error o cambio de tipo)
         else if (Array.isArray(response)) {
@@ -534,4 +536,18 @@ cerrarModalCompetencia(): void {
     this.competenciaService.limpiar();
   }, 100);
 }
+
+
+ obtenerMatching(): void {
+    this.matchingService.obtenerMatch(this.idUsuarioGlobal!)
+      .subscribe({
+        next: (data) => {
+          console.log('MATCHING RECIBIDO:', data);
+          this.ofertas = data;
+        },
+        error: (err) => {
+          console.error('Error obteniendo matching:', err);
+        }
+      });
+  }
 }

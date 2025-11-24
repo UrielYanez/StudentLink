@@ -10,6 +10,7 @@ import { MatchingRequest, VacanteMatch } from '../models/maching';
 })
 export class Maching {
  private apiUrl = `${environment.apiUrl}/api/ms_maching/maching`;
+ private apiUrl2 = `${environment.apiUrl}/api/matching/chain`;
 
   constructor(private http: HttpClient) { }
 
@@ -78,4 +79,10 @@ export class Maching {
 
     return cleanBody;
   }
+
+
+   obtenerMatch(clienteId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl2}?clienteId=${clienteId}`);
+  }
+  
 }
