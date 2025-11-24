@@ -1,0 +1,12 @@
+<div class="chart-container">
+      <canvas #myCanvas width="400" height="180"></canvas>
+      <div class="chart-info">
+        <p class="chart-caption">{{ caption }}</p>
+        <div class="chart-stats" *ngIf="showStats">
+          <span class="stat-item">📊 {{ cantidadPostulantes }} postulante(s)</span>
+          <span class="stat-item" *ngIf="estrategiaActual">
+            {{ estrategiaActual }}
+          </span>
+        </div>
+      </div>
+</div>

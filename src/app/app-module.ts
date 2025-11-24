@@ -29,7 +29,7 @@ import { PerfilUsuarioComponent } from './users/perfil-usuario-component/perfil-
 import { SlugifyPipe } from './pipes/slugify-pipe';
 import { CvComponent } from './users/cv-component/cv-component';
 import { Chat } from './components/chat/chat';
-import { MatchChartComponent } from './components/match-chart/match-chart.component';
+import { MatchChartComponent } from './components/match-chart/match-chart';
 
 @NgModule({
   declarations: [
@@ -44,7 +44,7 @@ import { MatchChartComponent } from './components/match-chart/match-chart.compon
     PerfilUsuarioComponent,
     SlugifyPipe,
     CvComponent,
-    MatchChartComponent
+    MatchChartComponent,
   ],
   imports: [
     BrowserModule,

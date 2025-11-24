@@ -1,58 +1,90 @@
+// =======================================================
+// SUBJECT (PUBLISHER) - Implementación manual
+// =======================================================
+
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { CompetenciaData, CompetenciaObserver, CompetenciaSubject } from '../interfaces/observer.interface';
 
-/**
- * Interfaz para los datos de competencia
- */
-export interface CompetenciaData {
-  competencia: number[];
-  estado: string;
-  miMatch: number;
-}
-
-/**
- * Servicio que implementa el patrón Observer usando RxJS
- * Este servicio actúa como el SUBJECT (Observable)
- */
 @Injectable({
   providedIn: 'root'
 })
-export class CompetenciaObserverService {
+export class CompetenciaObserverService implements CompetenciaSubject {
 
-  // BehaviorSubject: Emite el último valor a nuevos suscriptores
-  private competenciaSubject = new BehaviorSubject<CompetenciaData | null>(null);
+  // Lista de observadores suscritos
+  private observers: CompetenciaObserver[] = [];
+
+  // Estado actual del subject
+  private currentData: CompetenciaData | null = null;
 
   /**
-   * Observable público para que los componentes se suscriban
-   * Los componentes que se suscriban actuarán como OBSERVERS
+   * Suscribe un nuevo observer
    */
-  public competencia$: Observable<CompetenciaData | null> = this.competenciaSubject.asObservable();
+  subscribe(observer: CompetenciaObserver): void {
+    const exists = this.observers.includes(observer);
+    if (!exists) {
+      this.observers.push(observer);
+      console.log('Observer suscrito. Total:', this.observers.length);
 
-  constructor() {
-    console.log('🔔 CompetenciaObserverService inicializado (SUBJECT creado)');
+      // Notificar inmediatamente con el estado actual (patrón BehaviorSubject)
+      if (this.currentData) {
+        observer.update(this.currentData);
+      }
+    }
   }
 
   /**
-   * Método para actualizar los datos (NOTIFICAR a todos los observers)
-   * @param data Datos de competencia actualizados
+   * Desuscribe un observer
+   */
+  unsubscribe(observer: CompetenciaObserver): void {
+    const index = this.observers.indexOf(observer);
+    if (index > -1) {
+      this.observers.splice(index, 1);
+      console.log('Observer desuscrito. Total:', this.observers.length);
+    }
+  }
+
+  /**
+   * Notifica a TODOS los observers
+   */
+  notifyObservers(): void {
+    console.log(`Notificando a ${this.observers.length} observers`);
+
+    for (const observer of this.observers) {
+      try {
+        observer.update(this.currentData);
+      } catch (error) {
+        console.error('Error notificando observer:', error);
+      }
+    }
+  }
+
+  /**
+   * Método público para cambiar el estado y notificar
    */
   notificarCambio(data: CompetenciaData): void {
-    console.log('📢 NOTIFY: Notificando cambio a todos los observers', data);
-    this.competenciaSubject.next(data);
+    this.currentData = data;
+    this.notifyObservers();
   }
 
   /**
-   * Método para limpiar los datos
+   * Limpiar datos y notificar
    */
   limpiar(): void {
-    console.log('🧹 NOTIFY: Limpiando datos de competencia');
-    this.competenciaSubject.next(null);
+    this.currentData = null;
+    this.notifyObservers();
   }
 
   /**
-   * Obtiene el valor actual sin suscribirse
+   * Obtener valor actual
    */
   obtenerValorActual(): CompetenciaData | null {
-    return this.competenciaSubject.value;
+    return this.currentData;
+  }
+
+  /**
+   * Obtener cantidad de observers (para debugging)
+   */
+  getCantidadObservers(): number {
+    return this.observers.length;
   }
 }
