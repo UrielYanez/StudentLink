@@ -320,42 +320,6 @@ tieneDatosCompetencia(): boolean {
   }
 
   /**
-   * Abre el modal de análisis de competencia
-   */
-  // abrirModalCompetencia(vacante: VacanteMatch): void {
-  //   // Asegurar que tenemos datos para la gráfica
-  //   if (!vacante.match_competencia) {
-  //     vacante.match_competencia = this.generarDatosCompetencia(vacante.porcentaje_match);
-  //   }
-  //   this.vacanteCompetencia = vacante;
-  //   this.mostrarModalCompetencia = true;
-  // }
-
-  /**
-   * Cierra el modal de competencia
-   */
-  // cerrarModalCompetencia(): void {
-  //   this.mostrarModalCompetencia = false;
-  //   this.vacanteCompetencia = null;
-  // }
-
-  /**
-   * Genera datos de competencia de ejemplo
-   */
-  private generarDatosCompetencia(miMatch: number): number[] {
-    const datos = [];
-    const cantidadCompetidores = Math.floor(Math.random() * 15) + 5; // 5-20 competidores
-
-    for (let i = 0; i < cantidadCompetidores; i++) {
-      let porcentaje = miMatch + (Math.random() * 40 - 20); // ±20 puntos
-      porcentaje = Math.max(0, Math.min(100, Math.round(porcentaje)));
-      datos.push(porcentaje);
-    }
-
-    return datos.sort((a, b) => b - a);
-  }
-
-  /**
    * Obtiene el texto descriptivo según el nivel de competencia
    */
   getTextoCompetencia(vacante: VacanteMatch): string {
@@ -528,22 +492,26 @@ tieneDatosCompetencia(): boolean {
  * PATRÓN OBSERVER: Método que NOTIFICA cambios
  * ============================================
  */
+/**
+ * ============================================
+ * PATRÓN OBSERVER: Método que NOTIFICA cambios
+ * ============================================
+ */
 abrirModalCompetencia(vacante: VacanteMatch): void {
   console.log('🚀 HomeComponent: Abriendo modal y NOTIFICANDO a observers');
   console.log('📊 Datos de competencia:', vacante.match_competencia);
 
-  // Asegurar que tenemos datos para la gráfica
-  if (!vacante.match_competencia || vacante.match_competencia.length === 0) {
-    console.log('⚠️ No hay match_competencia, generando datos de ejemplo');
-    vacante.match_competencia = this.generarDatosCompetencia(vacante.porcentaje_match);
+  // ✅ NO GENERAR DATOS FALSOS
+  // Si no hay competencia, se debe mostrar la estrategia NoCompetitionStrategy
+  if (!vacante.match_competencia) {
+    vacante.match_competencia = [];
   }
 
   this.vacanteCompetencia = vacante;
   this.mostrarModalCompetencia = true;
 
   // ✨ PATRÓN OBSERVER: NOTIFY
-  // Notificamos al Subject con los nuevos datos
-  // IMPORTANTE: Usar setTimeout para asegurar que el componente ya está montado
+  // Notificamos al Subject con los datos reales (que pueden ser un array vacío)
   setTimeout(() => {
     this.competenciaService.notificarCambio({
       competencia: vacante.match_competencia || [],
@@ -561,7 +529,6 @@ cerrarModalCompetencia(): void {
 
   this.mostrarModalCompetencia = false;
 
-  // Limpiamos los datos del observer con un pequeño delay
   setTimeout(() => {
     this.vacanteCompetencia = null;
     this.competenciaService.limpiar();
